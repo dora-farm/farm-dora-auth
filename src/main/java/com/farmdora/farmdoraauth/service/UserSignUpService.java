@@ -29,7 +29,11 @@ public class UserSignUpService {
     @Transactional(readOnly = true)
     public void idCheck(String id) {
         Optional<User> user = userRepository.findById(id);
+
         if (user.isPresent()) {
+            User userEntity = user.get();
+            System.out.println("유저"+user);
+            System.out.println("권한"+userEntity);
             throw new RuntimeException("이미 존재하는 아이디입니다.");
         }
     }

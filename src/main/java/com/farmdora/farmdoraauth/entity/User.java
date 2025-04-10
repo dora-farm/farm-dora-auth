@@ -46,7 +46,7 @@ public class User extends BaseTimeEntity {
 
     private LocalDate birth;
 
-//    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.ORDINAL)
     private byte sex;
 
     @Column(length = 30)
@@ -58,7 +58,7 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private boolean isBlind;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auth_id")
     private Auth auth;
 
