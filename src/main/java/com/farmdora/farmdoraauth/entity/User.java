@@ -46,7 +46,7 @@ public class User extends BaseTimeEntity {
 
     private LocalDate birth;
 
-//    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.ORDINAL)
     private byte sex;
 
     @Column(length = 30)

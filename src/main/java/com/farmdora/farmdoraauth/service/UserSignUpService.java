@@ -77,7 +77,7 @@ public class UserSignUpService {
                 .email(userSignUpDto.getEmail())
                 .accountNum(userSignUpDto.getAccountNum())
                 .birth(userSignUpDto.getBirth())
-                .sex(userSignUpDto.getSex().getValue())
+                .sex((byte) userSignUpDto.getSex().getValue())
                 .phoneNum(userSignUpDto.getPhoneNum())
                 .bankType(bankType)
                 .auth(Auth.builder()

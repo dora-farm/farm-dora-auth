@@ -67,7 +67,6 @@ public class UserSignUpRestController {
     }
 
     @PostMapping("/register")
-    @Transactional
     public HttpResponse registerUser(@RequestBody UserSignUpDto userSignUpDto) {
 
         log.info("요청 json 파라미터 {}", userSignUpDto);
