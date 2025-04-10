@@ -35,6 +35,20 @@ dependencies {
 
     // jasypt
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
+
+    // email verification
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //jwt
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+
 }
 
 tasks.named('test') {
