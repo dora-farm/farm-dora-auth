@@ -66,7 +66,7 @@ public class UserSignUpService {
 
         String encodedPwd = bCryptPasswordEncoder.encode(userSignUpDto.getPwd());
 
-        log.info("PWD: " + encodedPwd);
+        log.info("gender: {}" , userSignUpDto.getSex());
 
         userSignUpDto.setPwd(encodedPwd);
 
@@ -77,7 +77,7 @@ public class UserSignUpService {
                 .email(userSignUpDto.getEmail())
                 .accountNum(userSignUpDto.getAccountNum())
                 .birth(userSignUpDto.getBirth())
-                .sex((byte) userSignUpDto.getSex().getValue())
+                .sex(userSignUpDto.getSex())
                 .phoneNum(userSignUpDto.getPhoneNum())
                 .bankType(bankType)
                 .auth(Auth.builder()
