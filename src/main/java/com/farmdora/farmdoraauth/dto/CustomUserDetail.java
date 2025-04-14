@@ -1,6 +1,7 @@
 package com.farmdora.farmdoraauth.dto;
 
 import com.farmdora.farmdoraauth.entity.User;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,8 +20,8 @@ public class CustomUserDetail implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-
         authorities.add((GrantedAuthority) () -> user.getAuth().getRole());
+        log.info("Authorities : {}", authorities);
 
         return authorities;
     }

@@ -2,6 +2,7 @@ package com.farmdora.farmdoraauth.dto;
 
 import com.farmdora.farmdoraauth.entity.Address;
 import com.farmdora.farmdoraauth.entity.Gender;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Optional<User> user = userRepository.findById(username);
         if (user.isPresent()) {
             User loginUser = user.get();
-            loginUser.getAuth().getRole();
+            log.info("User : {}", loginUser);
             return new CustomUserDetail(loginUser);
         }
         return null;

@@ -1,6 +1,7 @@
 package com.farmdora.farmdoraauth.service;
 
-import com.farmdora.farmdoraauth.customException.BankTypeNotFoundException;
+import com.farmdora.farmdoraauth.common.exception.ResourceAlreadyExistsException;
+import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
 import com.farmdora.farmdoraauth.dto.UserSignUpDto;
 import com.farmdora.farmdoraauth.entity.*;
 import com.farmdora.farmdoraauth.repository.BankTypeRepository;
@@ -31,10 +32,8 @@ public class UserSignUpService {
         Optional<User> user = userRepository.findById(id);
 
         if (user.isPresent()) {
-            User userEntity = user.get();
-            System.out.println("유저"+user);
-            System.out.println("권한"+userEntity);
-            throw new RuntimeException("이미 존재하는 아이디입니다.");
+            log.info("존재 아이디 {}", user.get().getId());
+            throw new ResourceAlreadyExistsException("idCheck", id);
         }
     }
 
@@ -42,7 +41,7 @@ public class UserSignUpService {
     public void emailCheck(String email){
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isPresent()) {
-            throw new RuntimeException("이미 존재하는 이메일입니다.");
+            throw new ResourceAlreadyExistsException("emailCheck", email);
         }
     }
 
@@ -64,13 +63,11 @@ public class UserSignUpService {
         userSignUpDto.setAuthId((short) 3);
 
         BankType bankType = bankTypeRepository.findById(userSignUpDto.getBankId())
-                .orElseThrow(() -> new BankTypeNotFoundException());
+                .orElseThrow(() -> new ResourceNotFoundException("BankType Entity", userSignUpDto.getBankId()));
 
         userSignUpDto.setBankId(bankType.getId());
 
         String encodedPwd = bCryptPasswordEncoder.encode(userSignUpDto.getPwd());
-
-        log.info("PWD: " + encodedPwd);
 
         userSignUpDto.setPwd(encodedPwd);
 
@@ -81,7 +78,7 @@ public class UserSignUpService {
                 .email(userSignUpDto.getEmail())
                 .accountNum(userSignUpDto.getAccountNum())
                 .birth(userSignUpDto.getBirth())
-                .sex(userSignUpDto.getSex().getValue())
+                .sex(userSignUpDto.getSex())
                 .phoneNum(userSignUpDto.getPhoneNum())
                 .bankType(bankType)
                 .auth(Auth.builder()

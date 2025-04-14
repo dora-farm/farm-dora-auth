@@ -1,5 +1,6 @@
 package com.farmdora.farmdoraauth.entity;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -47,7 +48,7 @@ public class User extends BaseTimeEntity {
     private LocalDate birth;
 
     @Enumerated(EnumType.ORDINAL)
-    private byte sex;
+    private Gender sex;
 
     @Column(length = 30)
     private String phoneNum;
@@ -65,4 +66,5 @@ public class User extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bank_id")
     private BankType bankType;
+
 }

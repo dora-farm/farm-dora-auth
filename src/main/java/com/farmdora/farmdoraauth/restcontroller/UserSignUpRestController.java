@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -40,7 +42,9 @@ public class UserSignUpRestController {
     }
 
     @PostMapping("/send/email")
-    public HttpResponse sendEmail(@RequestParam("email") String email) {
+    public HttpResponse sendEmail(@RequestBody Map<String, String> emailBody) {
+        String email = emailBody.get("email");
+        log.info(email);
         userSignUpService.sendVerificationEmail(email);
         return HttpResponse.builder()
                 .status(200)
@@ -50,8 +54,10 @@ public class UserSignUpRestController {
     }
 
     @PostMapping("/verify/email")
-    public HttpResponse verifyEmail(@RequestParam("email") String email,
-                                    @RequestParam("code") String code) {
+    public HttpResponse verifyEmail(@RequestBody Map<String, String> emailBody) {
+        String email = emailBody.get("email");
+        String code = emailBody.get("code");
+
         if(userSignUpService.verifyEmail(email, code)){
             return HttpResponse.builder()
                     .status(200)
@@ -67,10 +73,9 @@ public class UserSignUpRestController {
     }
 
     @PostMapping("/register")
-    @Transactional
-    public HttpResponse registerUser(@RequestBody UserSignUpDto userSignUpDto) {
+    public HttpResponse registerUser(@ModelAttribute UserSignUpDto userSignUpDto) {
 
-        log.info("요청 json 파라미터 {}", userSignUpDto);
+        log.info("요청 파라미터 {}", userSignUpDto);
 
         boolean result = userSignUpService.registerUser(userSignUpDto);
         return HttpResponse.builder()

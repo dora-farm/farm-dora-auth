@@ -27,7 +27,7 @@ spring:
       port: 6379
       host: ENC(nj998P/iLMkTy602U0MI3bLVj6BYoBkQ)
 
-  jwt.secret: ENC(ZSu2bQr9ZiDSPflYu3aYv0f3DWiWZ4+wVje3Zs4WtHo=)
+  jwt.secret: ENC(AJv6LokZXWCLSDdDEFT1UGe19935JohjmPnbyDPFNQWa+WgVgEaBrsg3Fo8Xo8Myj3KHBd5e5Ka5pLS8nyOm2NNBdvwSAbjfBlpcZENOkyA=)
 
 jasypt:
   encryptor:

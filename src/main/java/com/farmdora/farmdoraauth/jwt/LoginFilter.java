@@ -1,21 +1,45 @@
 package com.farmdora.farmdoraauth.jwt;
 
+import com.farmdora.farmdoraauth.common.response.HttpResponse;
+import com.farmdora.farmdoraauth.dto.CustomUserDetail;
+import com.farmdora.farmdoraauth.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+
+    private final JwtUtil jwtUtil;
+
+    private final RedisTemplate<String, Object> redisTemplate;
+
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -33,14 +57,61 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
         //로그인 성공시 실행하는 메소드(여기서 JWT 발급)
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, Authentication authentication){
-        log.info("로그인 성공 {},{}", authentication.getName(), authentication.getAuthorities().stream().iterator().next().getAuthority());
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, Authentication authentication) throws IOException {
+        CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
+        String username = customUserDetail.getUsername();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String role = authorities.stream().iterator().next().getAuthority();
+
+        String token = jwtUtil.createJwt(username, role, 60*60*10L);
+
+//        Map<String, Object> userData = new HashMap<>();
+//        userData.put("username", username);
+//        userData.put("role", role);
+//        userData.put("token", token);
+
+        try {
+            redisTemplate.opsForValue().set("accessToken:" + username, token , Duration.ofHours(5));
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("redis 저장실패"+e.getMessage());
+        }
+
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("accessToken", token);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String responseJson = objectMapper.writeValueAsString(result);
+
+        response.setContentType("application/json;charset=utf-8");
+        response.getWriter().write(responseJson);
     }
 
         //로그인 실패시 실행하는 메소드
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed){
-        log.info("로그인 실패");
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
+        String errorMessage ;
+
+        if (failed instanceof BadCredentialsException) {
+            log.info("비밀번호가 다릅니다.");
+
+            errorMessage = "비밀번호가 다릅니다.";
+        }else {
+            errorMessage = "로그인에 실패 하였습니다.";
+        }
+
+        try{
+            response.setContentType("application/json;charset=utf-8");
+            response.getWriter().write(
+                     new ObjectMapper().writeValueAsString(new HttpResponse(HttpStatus.UNAUTHORIZED,errorMessage,null)));
+            response.getWriter().flush();
+        } catch (Exception e) {
+            log.info(e.getMessage());
+        }
+
     }
 
 
