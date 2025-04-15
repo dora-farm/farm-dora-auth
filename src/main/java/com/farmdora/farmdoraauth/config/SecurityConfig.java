@@ -3,7 +3,6 @@ package com.farmdora.farmdoraauth.config;
 import com.farmdora.farmdoraauth.jwt.JwtAuthenticationFilter;
 import com.farmdora.farmdoraauth.jwt.JwtUtil;
 import com.farmdora.farmdoraauth.jwt.LoginFilter;
-//import com.farmdora.farmdoraauth.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +40,7 @@ public class SecurityConfig {
     }
 
     // 필드의 configuration 안 쓰고 파라미터로
+    // AuthenticationManager는 UserDetailsService 기반으로 자동 구성됨
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((auth)->
                         auth.requestMatchers("/**").permitAll()
                                 .anyRequest().permitAll())

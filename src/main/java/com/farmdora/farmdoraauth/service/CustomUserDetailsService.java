@@ -1,5 +1,7 @@
 package com.farmdora.farmdoraauth.service;
 
+import com.farmdora.farmdoraauth.common.exception.AccessDeniedException;
+import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
 import com.farmdora.farmdoraauth.entity.User;
 import com.farmdora.farmdoraauth.dto.CustomUserDetail;
 import com.farmdora.farmdoraauth.repository.UserRepository;
@@ -11,8 +13,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -21,15 +21,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findById(username);
-        if (user.isPresent()) {
-            User loginUser = user.get();
-            log.info("User : {}", loginUser);
-            return new CustomUserDetail(loginUser);
+        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("로그인",username));
+        log.info("차단여부 {}",user.isBlind());
+        if (user.isBlind()) {
+            throw new AccessDeniedException();
         }
-        return null;
+
+        return new CustomUserDetail(user);
     }
 }

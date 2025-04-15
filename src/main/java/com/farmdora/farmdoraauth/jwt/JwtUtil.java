@@ -56,7 +56,7 @@ public class JwtUtil {
                     .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token).getPayload();
-
+            log.info("토큰 유효성 {}",!claims.getExpiration().before(new Date()));
             return !claims.getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
             log.error("Jwt 요효성 검사 실패: {}" , e.getMessage());

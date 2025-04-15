@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -19,11 +20,13 @@ public class CustomUserDetail implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add((GrantedAuthority) () -> user.getAuth().getRole());
-        log.info("Authorities : {}", authorities);
+//        Collection<GrantedAuthority> authorities = new ArrayList<>();
+//        authorities.add((GrantedAuthority) () -> user.getAuth().getRole());
+//        log.info("Authorities : {}", authorities);
+//
+//        return authorities;
 
-        return authorities;
+        return Collections.singleton(()->user.getAuth().getRole());
     }
 
     @Override
@@ -38,7 +41,7 @@ public class CustomUserDetail implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return !user.isBlind();
     }
 
     @Override

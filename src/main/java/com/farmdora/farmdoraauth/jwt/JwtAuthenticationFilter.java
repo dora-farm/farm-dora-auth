@@ -23,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = request.getHeader("Authorization");
+        log.info("token: {}",token);
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7); // "Bearer " 제거
 
@@ -31,8 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String username = jwtUtil.getUsername(token);
                 log.debug("username : {}", username);
 
-                // Redis 블랙리스트 확인 (선택 사항)
+                // Redis 블랙리스트 확인 ()
                 if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
+                    log.debug("blacklist ");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     return;
                 }
