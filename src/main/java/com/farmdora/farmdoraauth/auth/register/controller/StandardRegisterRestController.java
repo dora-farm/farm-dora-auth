@@ -15,7 +15,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("standard/register")
+@RequestMapping("/standard/register")
 public class StandardRegisterRestController {
     private final StandardRegisterService standardRegisterService;
 
