@@ -1,0 +1,18 @@
+package com.farmdora.farmdoraauth.auth.oauth.repository;
+
+import com.farmdora.farmdoraauth.entity.Sns;
+import com.farmdora.farmdoraauth.entity.User;
+import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
+
+
+public interface SnsRepository extends JpaRepository<Sns, String> {
+
+    @Query("SELECT s.user FROM Sns s WHERE s.snsName = :snsName")
+    Optional<User> findUserBySnsName(@Param("snsName") String snsName);
+
+}

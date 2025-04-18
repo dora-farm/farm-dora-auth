@@ -1,10 +1,11 @@
-package com.farmdora.farmdoraauth.service;
+package com.farmdora.farmdoraauth.auth.register.service;
 
-import com.farmdora.farmdoraauth.customException.BankTypeNotFoundException;
-import com.farmdora.farmdoraauth.dto.UserSignUpDto;
+import com.farmdora.farmdoraauth.common.exception.ResourceAlreadyExistsException;
+import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
+import com.farmdora.farmdoraauth.auth.register.dto.StandardRegisterDto;
 import com.farmdora.farmdoraauth.entity.*;
-import com.farmdora.farmdoraauth.repository.BankTypeRepository;
-import com.farmdora.farmdoraauth.repository.UserRepository;
+import com.farmdora.farmdoraauth.auth.register.repository.BankTypeRepository;
+import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,7 +19,7 @@ import java.util.Random;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserSignUpService {
+public class StandardRegisterService {
 
     private final UserRepository userRepository;
     private final BankTypeRepository bankTypeRepository;
@@ -29,8 +30,10 @@ public class UserSignUpService {
     @Transactional(readOnly = true)
     public void idCheck(String id) {
         Optional<User> user = userRepository.findById(id);
+
         if (user.isPresent()) {
-            throw new RuntimeException("이미 존재하는 아이디입니다.");
+            log.info("존재 아이디 {}", user.get().getId());
+            throw new ResourceAlreadyExistsException("idCheck", id);
         }
     }
 
@@ -38,7 +41,7 @@ public class UserSignUpService {
     public void emailCheck(String email){
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isPresent()) {
-            throw new RuntimeException("이미 존재하는 이메일입니다.");
+            throw new ResourceAlreadyExistsException("emailCheck", email);
         }
     }
 
@@ -56,32 +59,30 @@ public class UserSignUpService {
         return isValid;
     }
 
-    public boolean registerUser(UserSignUpDto userSignUpDto){
-        userSignUpDto.setAuthId((short) 3);
+    public boolean registerUser(StandardRegisterDto standardRegisterDto){
+        standardRegisterDto.setAuthId((short) 3);
 
-        BankType bankType = bankTypeRepository.findById(userSignUpDto.getBankId())
-                .orElseThrow(() -> new BankTypeNotFoundException());
+        BankType bankType = bankTypeRepository.findById(standardRegisterDto.getBankId())
+                .orElseThrow(() -> new ResourceNotFoundException("BankType Entity", standardRegisterDto.getBankId()));
 
-        userSignUpDto.setBankId(bankType.getId());
+        standardRegisterDto.setBankId(bankType.getId());
 
-        String encodedPwd = bCryptPasswordEncoder.encode(userSignUpDto.getPwd());
+        String encodedPwd = bCryptPasswordEncoder.encode(standardRegisterDto.getPwd());
 
-        log.info("gender: {}" , userSignUpDto.getSex());
-
-        userSignUpDto.setPwd(encodedPwd);
+        standardRegisterDto.setPwd(encodedPwd);
 
         User user = User.builder()
-                .id(userSignUpDto.getId())
-                .pwd(userSignUpDto.getPwd())
-                .name(userSignUpDto.getName())
-                .email(userSignUpDto.getEmail())
-                .accountNum(userSignUpDto.getAccountNum())
-                .birth(userSignUpDto.getBirth())
-                .sex(userSignUpDto.getSex())
-                .phoneNum(userSignUpDto.getPhoneNum())
+                .id(standardRegisterDto.getId())
+                .pwd(standardRegisterDto.getPwd())
+                .name(standardRegisterDto.getName())
+                .email(standardRegisterDto.getEmail())
+                .accountNum(standardRegisterDto.getAccountNum())
+                .birth(standardRegisterDto.getBirth())
+                .sex(standardRegisterDto.getSex())
+                .phoneNum(standardRegisterDto.getPhoneNum())
                 .bankType(bankType)
                 .auth(Auth.builder()
-                        .id(userSignUpDto.getAuthId())
+                        .id(standardRegisterDto.getAuthId())
                         .build())
                 .isExpire(false)
                 .isBlind(false)
