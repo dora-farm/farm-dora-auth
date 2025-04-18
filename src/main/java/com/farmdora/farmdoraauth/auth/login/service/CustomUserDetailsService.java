@@ -1,22 +1,20 @@
-package com.farmdora.farmdoraauth.service;
+package com.farmdora.farmdoraauth.auth.login.service;
 
 import com.farmdora.farmdoraauth.common.exception.AccessDeniedException;
 import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
 import com.farmdora.farmdoraauth.entity.User;
-import com.farmdora.farmdoraauth.dto.CustomUserDetail;
-import com.farmdora.farmdoraauth.repository.UserRepository;
+import com.farmdora.farmdoraauth.auth.login.dto.CustomUserDetail;
+import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;

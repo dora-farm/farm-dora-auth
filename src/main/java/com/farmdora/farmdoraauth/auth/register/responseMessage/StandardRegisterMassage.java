@@ -1,11 +1,11 @@
-package com.farmdora.farmdoraauth.responseMessage;
+package com.farmdora.farmdoraauth.auth.register.responseMessage;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum UserRegisterMassage {
+public enum StandardRegisterMassage {
 
     ID_CHECK_SUCCESS("아이디 중복체크에 성공하였습니다."),
     EMAIL_CHECK_SUCCESS("이메일 중복체크에 성공하였습니다."),

@@ -1,4 +1,4 @@
-package com.farmdora.farmdoraauth.repository;
+package com.farmdora.farmdoraauth.auth.register.repository;
 
 import com.farmdora.farmdoraauth.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;

@@ -1,4 +1,4 @@
-package com.farmdora.farmdoraauth.service;
+package com.farmdora.farmdoraauth.auth.register.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

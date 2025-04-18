@@ -1,10 +1,12 @@
-package com.farmdora.farmdoraauth.service;
+package com.farmdora.farmdoraauth.auth.register.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 public class EmailRedisService {
     private final RedisTemplate<String, String> redisTemplate;
@@ -21,6 +23,8 @@ public class EmailRedisService {
     // 인증 코드 검증
     public boolean verifyCode(String email, String code) {
         String savedCode = redisTemplate.opsForValue().get(email);
+        log.info("Email verification code: {}" , savedCode);
+        log.info("Email code: {}" , code);
         return code.equals(savedCode);
     }
 

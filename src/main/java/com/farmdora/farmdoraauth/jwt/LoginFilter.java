@@ -1,7 +1,7 @@
 package com.farmdora.farmdoraauth.jwt;
 
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
-import com.farmdora.farmdoraauth.dto.CustomUserDetail;
+import com.farmdora.farmdoraauth.auth.login.dto.CustomUserDetail;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,9 +29,7 @@ import java.util.Map;
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
-
     private final JwtUtil jwtUtil;
-
     private final RedisTemplate<String, Object> redisTemplate;
 
 
@@ -61,7 +59,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String role = authorities.stream().iterator().next().getAuthority();
 
-
         String token = jwtUtil.createJwt(username, role, 60 * 60 * 10L);
 
         if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
@@ -73,13 +70,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         try {
             redisTemplate.opsForValue().set("accessToken:" + username, token, Duration.ofHours(5));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("레디스 저장 오류 {}", e.getMessage());
         }
-
-        // Spring Security context에 사용자 정보 설정
-        UsernamePasswordAuthenticationToken securityAuthentication =
-                new UsernamePasswordAuthenticationToken(username, null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(securityAuthentication);
 
         //응답에 jwt 토큰 반환
         Map<String, Object> result = new HashMap<>();

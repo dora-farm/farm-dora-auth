@@ -1,12 +1,11 @@
-package com.farmdora.farmdoraauth.dto;
+package com.farmdora.farmdoraauth.auth.login.dto;
 
 import com.farmdora.farmdoraauth.entity.User;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import java.util.ArrayList;
+
 import java.util.Collection;
 import java.util.Collections;
 
@@ -16,16 +15,8 @@ public class CustomUserDetail implements UserDetails {
 
     private final User user;
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
-//        Collection<GrantedAuthority> authorities = new ArrayList<>();
-//        authorities.add((GrantedAuthority) () -> user.getAuth().getRole());
-//        log.info("Authorities : {}", authorities);
-//
-//        return authorities;
-
         return Collections.singleton(()->user.getAuth().getRole());
     }
 

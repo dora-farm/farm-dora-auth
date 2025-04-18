@@ -1,8 +1,6 @@
-package com.farmdora.farmdoraauth.dto;
+package com.farmdora.farmdoraauth.auth.register.dto;
 
-import com.farmdora.farmdoraauth.entity.Address;
 import com.farmdora.farmdoraauth.entity.Gender;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +12,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSignUpDto {
+public class StandardRegisterDto {
 
     private String name;
     private String id;
