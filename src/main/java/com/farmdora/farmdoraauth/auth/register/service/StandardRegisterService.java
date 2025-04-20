@@ -38,28 +38,28 @@ public class StandardRegisterService {
     }
 
     @Transactional(readOnly = true)
-    public void emailCheck(String email){
+    public void emailCheck(String email) {
         Optional<User> user = userRepository.findByEmail(email);
-        if(user.isPresent()) {
+        if (user.isPresent()) {
             throw new ResourceAlreadyExistsException("emailCheck", email);
         }
     }
 
-    public void sendVerificationEmail(String email){
+    public void sendVerificationEmail(String email, String sub, String title, String content) {
         String code = String.valueOf(new Random().nextInt(999999));
         emailRedisService.saveVerificationCode(email, code);
-        emailSendService.sendEmail(email,"이메일 인증 요청",code);
+        emailSendService.sendEmail(email, sub, code , title, content);
     }
 
-    public boolean verifyEmail(String email, String code){
+    public boolean verifyEmail(String email, String code) {
         boolean isValid = emailRedisService.verifyCode(email, code);
-        if(isValid){
+        if (isValid) {
             emailRedisService.deleteVerificationCode(email);
         }
         return isValid;
     }
 
-    public boolean registerUser(StandardRegisterDto standardRegisterDto){
+    public boolean registerUser(StandardRegisterDto standardRegisterDto) {
         standardRegisterDto.setAuthId((short) 3);
 
         BankType bankType = bankTypeRepository.findById(standardRegisterDto.getBankId())
@@ -94,5 +94,7 @@ public class StandardRegisterService {
         } catch (Exception e) {
             return false;
         }
-    };
+    }
+
+    ;
 }

@@ -15,7 +15,7 @@ public class EmailSendService {
         this.mailSender = mailSender;
     }
 
-    public void sendEmail(String to, String subject, String verificationCode) {
+    public void sendEmail(String to, String subject, String verificationCode,String title, String content) {
         try {
             // MimeMessage 객체 생성
             MimeMessage message = mailSender.createMimeMessage();
@@ -28,10 +28,10 @@ public class EmailSendService {
                     + "    <div style=\"max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 10px; "
                     + "                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); text-align: center; padding: 20px;\">"
                     + "        <div style=\"background-color: #1CA673; color: white; padding: 20px; font-size: 24px; font-weight: bold;\">"
-                    + "            이메일 인증 요청"
+                    +             title
                     + "        </div>"
                     + "        <div style=\"margin: 20px 0; color: #333; font-size: 16px;\">"
-                    + "            <p>안녕하세요! 아래의 인증 코드를 입력하여 인증을 완료하세요:</p>"
+                    + "            <p>"+content+"</p>"
                     + "            <p style=\"font-size: 2em; color: #4CAF50; font-weight: bold; margin: 20px 0;\">" + verificationCode + "</p>"
                     + "        </div>"
                     + "        <div style=\"font-size: 12px; color: #888; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd;\">"

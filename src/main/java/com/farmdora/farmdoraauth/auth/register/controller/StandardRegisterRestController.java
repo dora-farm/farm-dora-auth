@@ -6,7 +6,6 @@ import com.farmdora.farmdoraauth.auth.register.responseMessage.StandardRegisterM
 import com.farmdora.farmdoraauth.auth.register.service.StandardRegisterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,24 +14,26 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Transactional
 @RequestMapping("/standard/register")
 public class StandardRegisterRestController {
     private final StandardRegisterService standardRegisterService;
+    String EMAIL_SUB = "이메일 인증";
+    private static final String EMAIL_TITLE = "이메일 인증 요청";
+    private static final String EMAIL_CONTENT = "안녕하세요! 아래의 인증 코드를 일력하여 인증을 완료하세요:";
 
     @GetMapping("/idcheck")
-    public ResponseEntity<?> idCheck(@RequestParam("id") String id) {
+    public HttpResponse idCheck(@RequestParam("id") String id) {
 
         standardRegisterService.idCheck(id);
-        return ResponseEntity.ok()
-                .body(HttpResponse.builder()
-                        .status(200)
-                        .message(StandardRegisterMassage.ID_CHECK_SUCCESS.getMessage())
-                        .data(null)
-                        .build());
+        return HttpResponse.builder()
+                .status(200)
+                .message(StandardRegisterMassage.ID_CHECK_SUCCESS.getMessage())
+                .data(null)
+                .build();
     }
 
     @GetMapping("/emailcheck")
-    @Transactional
     public HttpResponse emailCheck(@RequestParam("email") String email) {
         standardRegisterService.emailCheck(email);
         return HttpResponse.builder()
@@ -46,7 +47,7 @@ public class StandardRegisterRestController {
     public HttpResponse sendEmail(@RequestBody Map<String, String> emailBody) {
         String email = emailBody.get("email");
         log.info(email);
-        standardRegisterService.sendVerificationEmail(email);
+        standardRegisterService.sendVerificationEmail(email, EMAIL_SUB, EMAIL_TITLE, EMAIL_CONTENT);
         return HttpResponse.builder()
                 .status(200)
                 .message(StandardRegisterMassage.EMAIL_SEND_SUCCESS.getMessage())
