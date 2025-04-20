@@ -3,7 +3,7 @@ package com.farmdora.farmdoraauth.auth.find.controller;
 import com.farmdora.farmdoraauth.auth.find.dto.FindDto;
 import com.farmdora.farmdoraauth.auth.find.dto.SendDto;
 import com.farmdora.farmdoraauth.auth.find.service.FindService;
-import com.farmdora.farmdoraauth.auth.register.responseMessage.StandardRegisterMassage;
+import com.farmdora.farmdoraauth.auth.register.message.StandardRegisterMassage;
 import com.farmdora.farmdoraauth.auth.register.service.StandardRegisterService;
 import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
 import com.farmdora.farmdoraauth.common.response.HttpResponse;

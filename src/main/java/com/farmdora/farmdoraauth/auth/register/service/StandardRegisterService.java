@@ -95,6 +95,4 @@ public class StandardRegisterService {
             return false;
         }
     }
-
-    ;
 }

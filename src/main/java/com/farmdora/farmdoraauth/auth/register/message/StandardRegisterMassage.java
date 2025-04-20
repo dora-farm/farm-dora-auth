@@ -1,4 +1,4 @@
-package com.farmdora.farmdoraauth.auth.register.responseMessage;
+package com.farmdora.farmdoraauth.auth.register.message;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

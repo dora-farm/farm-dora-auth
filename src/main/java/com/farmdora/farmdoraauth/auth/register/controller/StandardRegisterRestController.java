@@ -2,7 +2,7 @@ package com.farmdora.farmdoraauth.auth.register.controller;
 
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
 import com.farmdora.farmdoraauth.auth.register.dto.StandardRegisterDto;
-import com.farmdora.farmdoraauth.auth.register.responseMessage.StandardRegisterMassage;
+import com.farmdora.farmdoraauth.auth.register.message.StandardRegisterMassage;
 import com.farmdora.farmdoraauth.auth.register.service.StandardRegisterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import java.util.Map;
 @RequestMapping("/standard/register")
 public class StandardRegisterRestController {
     private final StandardRegisterService standardRegisterService;
-    String EMAIL_SUB = "이메일 인증";
+    private static final String EMAIL_SUB = "이메일 인증";
     private static final String EMAIL_TITLE = "이메일 인증 요청";
     private static final String EMAIL_CONTENT = "안녕하세요! 아래의 인증 코드를 일력하여 인증을 완료하세요:";
 
