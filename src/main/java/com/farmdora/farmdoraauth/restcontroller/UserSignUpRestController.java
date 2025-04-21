@@ -84,7 +84,7 @@ public class UserSignUpRestController {
     }
 
     @PostMapping("/register")
-    public HttpResponse registerUser(@ModelAttribute UserSignUpDto userSignUpDto) {
+    public HttpResponse registerUser(@RequestBody UserSignUpDto userSignUpDto) {
 
         log.info("요청 파라미터 {}", userSignUpDto);
 
