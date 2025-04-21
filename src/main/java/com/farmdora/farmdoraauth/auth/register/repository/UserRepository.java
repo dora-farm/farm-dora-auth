@@ -4,6 +4,8 @@ import com.farmdora.farmdoraauth.entity.User;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,6 +16,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @EntityGraph(attributePaths = {"auth"})
     Optional<User> findById(String id);
+
+    @Query("select u.userId from User u where u.id =:id ")
+    int findUserIdById(@Param("id") String id);
 
     @Query("SELECT u.id from User u where u.email= :email")
     String findIdByEmail(@Param("email") String email);

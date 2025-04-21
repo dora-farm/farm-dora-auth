@@ -20,13 +20,10 @@ import java.io.IOException;
 public class OAuthRegisterService {
 
     private final SnsRegisterRepository snsRegisterRepository;
-    private final UserRepository userRepository;
     private final SnsTypeRepository snsTypeRepository;
 
-    public void registerOAuth(String id, String provider, String snsName) throws IOException {
+    public void registerOAuth(int userId, String provider, String snsName) throws IOException {
 
-        User user = userRepository.findById(id).orElseThrow();
-        int userId = user.getUserId();
         short typeId = snsTypeRepository.findByName(provider).getId();
 
         Sns sns = Sns.builder()

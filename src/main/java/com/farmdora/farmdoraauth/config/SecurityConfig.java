@@ -2,6 +2,7 @@ package com.farmdora.farmdoraauth.config;
 
 import com.farmdora.farmdoraauth.auth.oauth.handler.CustomOAuth2FailureHandler;
 import com.farmdora.farmdoraauth.auth.oauth.handler.CustomOAuth2SuccessHandler;
+import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import com.farmdora.farmdoraauth.jwt.JwtAuthenticationFilter;
 import com.farmdora.farmdoraauth.jwt.JwtUtil;
 import com.farmdora.farmdoraauth.jwt.LoginFilter;
@@ -36,6 +37,7 @@ public class SecurityConfig {
     private final RedisTemplate<String, Object> redisTemplate;
     private final CustomOAuth2SuccessHandler oAuth2SuccessHandler;
     private final CustomOAuth2FailureHandler oAuth2FailureHandler;
+    private final UserRepository userRepository;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -59,7 +61,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth)->
                         auth.requestMatchers("/**").permitAll()
                                 .anyRequest().permitAll())
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,redisTemplate),
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,redisTemplate,userRepository),
                         UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo ->
