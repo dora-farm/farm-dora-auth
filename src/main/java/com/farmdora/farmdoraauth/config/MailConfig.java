@@ -1,5 +1,6 @@
 package com.farmdora.farmdoraauth.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,15 +13,13 @@ import java.util.Properties;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class MailConfig {
 
-    @Autowired
-    private Environment env;
+    private final Environment env;
 
     @Bean
     public JavaMailSender getJavaMailSender() {
-
-        log.info("비번 {}", env.getProperty("spring.mail.password"));
 
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(env.getProperty("spring.mail.host"));

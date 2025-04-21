@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.transaction.annotation.Transactional;
 
 @Getter
 @Builder
@@ -21,6 +22,5 @@ public class Auth {
     @Column(name = "auth_id")
     private Short id;
 
-    @Column(nullable = false, length = 50)
     private String role;
 }
