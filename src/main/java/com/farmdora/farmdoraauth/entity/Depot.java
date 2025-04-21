@@ -44,8 +44,19 @@ public class Depot {
     @Embedded
     private Address address;
 
+    @Column(name = "`require`")
     private String require;
 
     @Column(nullable = false)
     private boolean isDefault;
+
+    public void updateInfo(String deliveryName, String receiverName, String phoneNum,
+                           Address address, String require, boolean defaultAddr) {
+        this.deliveryName = deliveryName;
+        this.name = receiverName;
+        this.phoneNum = phoneNum;
+        this.address = address;
+        this.require = require;
+        this.isDefault = defaultAddr;
+    }
 }

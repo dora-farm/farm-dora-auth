@@ -2,6 +2,7 @@ package com.farmdora.farmdoraauth.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,35 +23,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String token = request.getHeader("Authorization");
-        log.info("token: {}",token);
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // "Bearer " 제거
 
-            // 토큰 유효성 검사
-            if (jwtUtil.validateToken(token)) {
-                String username = jwtUtil.getUsername(token);
-                log.debug("username : {}", username);
+        String token = JwtFromCookie.extractTokenFromCookie(request);
 
-                // Redis 블랙리스트 확인 ()
-                if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
-                    log.debug("blacklist ");
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    return;
-                }
+        if (token != null && jwtUtil.validateToken(token)) {
+            int userId = jwtUtil.getUserId(token);
+            log.debug("인증된 사용자: {}", userId);
 
-                // Spring Security Context에 사용자 정보 추가
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        username, null, jwtUtil.getAuthorities(token));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
+            // 블랙리스트 체크
+            if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
+                log.warn("블랙리스트 토큰 접근 차단");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
+
+            // SecurityContext 설정
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userId, null, jwtUtil.getAuthorities(token));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
         filterChain.doFilter(request, response);
     }
-
-
 }
 
