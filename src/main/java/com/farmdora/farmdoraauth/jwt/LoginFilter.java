@@ -1,5 +1,6 @@
 package com.farmdora.farmdoraauth.jwt;
 
+import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
 import com.farmdora.farmdoraauth.auth.login.dto.CustomUserDetail;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +32,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final UserRepository userRepository;
 
 
     @Override
@@ -56,10 +58,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
         String username = customUserDetail.getUsername();
+        int userId = userRepository.findUserIdById(username);
+        log.info("로그인 유저의 프라이머리키 {}",userId);
+
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String role = authorities.stream().iterator().next().getAuthority();
 
-        String token = jwtUtil.createJwt(username, role, 60 * 60 * 10L);
+        String token = jwtUtil.createJwt(userId, role, 60 * 60 * 10L);
 
         if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -68,7 +73,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         }
 
         try {
-            redisTemplate.opsForValue().set("accessToken:" + username, token, Duration.ofHours(5));
+            redisTemplate.opsForValue().set("accessToken:" + userId, token, Duration.ofHours(5));
         } catch (Exception e) {
             log.error("레디스 저장 오류 {}", e.getMessage());
         }
@@ -109,8 +114,5 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         } catch (Exception e) {
             log.info(e.getMessage());
         }
-
     }
-
-
 }

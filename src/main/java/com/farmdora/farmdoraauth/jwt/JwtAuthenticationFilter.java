@@ -27,8 +27,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = extractTokenFromCookie(request);
 
         if (token != null && jwtUtil.validateToken(token)) {
-            String username = jwtUtil.getUsername(token);
-            log.debug("인증된 사용자: {}", username);
+            int userId = jwtUtil.getUserId(token);
+            log.debug("인증된 사용자: {}", userId);
 
             // 블랙리스트 체크
             if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // SecurityContext 설정
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(username, null, jwtUtil.getAuthorities(token));
+                    new UsernamePasswordAuthenticationToken(userId, null, jwtUtil.getAuthorities(token));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 

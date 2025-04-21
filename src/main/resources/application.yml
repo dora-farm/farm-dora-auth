@@ -49,7 +49,7 @@ spring:
             scope: name, email
 
           kakao:
-            client-id: ENC(zjPru5ip84YiyYir0HG1KWPeDyZy5U59UOuxWPzglBpbZ1dW1ql06kJ0KhYQDgYh)
+            client-id: ENC(+rrW5X+/yoleADUlkZ4c6J5azM0hLRLZUZrlDxVqfbMj2+n1Ii1sKplxgPt9LDGP)
             client-name: Kakao
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"

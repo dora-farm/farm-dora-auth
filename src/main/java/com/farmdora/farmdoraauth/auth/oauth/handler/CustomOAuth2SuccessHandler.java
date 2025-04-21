@@ -41,10 +41,10 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             log.info("snsName: {}, provider: {}", snsName, provider);
 
             User user = oAuthLoginService.oauthLogin(snsName);
-            String username = user.getId();
+            int userId = user.getUserId();
             String role = user.getAuth().getRole();
 
-            String token = jwtUtil.createJwt(username, role, 60 * 60 * 10L);
+            String token = jwtUtil.createJwt(userId, role, 60 * 60 * 10L);
 
             if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -53,12 +53,12 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             }
 
             try {
-                redisTemplate.opsForValue().set("accessToken:" + username, token, Duration.ofHours(5));
+                redisTemplate.opsForValue().set("accessToken:" + userId, token, Duration.ofHours(5));
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            authentication = new UsernamePasswordAuthenticationToken(username, null, jwtUtil.getAuthorities(token));
+            authentication = new UsernamePasswordAuthenticationToken(userId, null, jwtUtil.getAuthorities(token));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             response.setContentType("application/json;charset=utf-8");

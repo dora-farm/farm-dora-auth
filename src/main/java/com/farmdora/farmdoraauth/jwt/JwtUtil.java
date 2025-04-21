@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 public class JwtUtil {
 
-    private SecretKey secretKey;
+    private final SecretKey secretKey;
 
     public JwtUtil(@Value("${spring.jwt.secret}") String secret) {
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
@@ -32,12 +32,12 @@ public class JwtUtil {
                         .getAlgorithm());
     }
 
-    public String getUsername(String token) {
+    public Integer getUserId(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
-                .getPayload().get("username", String.class);
+                .getPayload().get("userId", Integer.class);
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities(String token) {
@@ -65,9 +65,9 @@ public class JwtUtil {
 
     }
 
-    public String createJwt(String username, String role, Long expiredMs){
+    public String createJwt(int userId, String role, Long expiredMs){
         return Jwts.builder()
-                .claim("username",username)
+                .claim("userId",userId)
                 .claim("role",role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))

@@ -41,6 +41,7 @@ public class OauthController {
         redisTemplate.opsForValue().set(REDIS_KEY, token, Duration.ofMinutes(5));
 
         String redirectUrl = env.getProperty("social.redirect.url") + provider;
+        log.info("redirectUrl = {}", redirectUrl);
         return HttpResponse.builder()
                 .message("아이디 저장성공")
                 .data(redirectUrl)
