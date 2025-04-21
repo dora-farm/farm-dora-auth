@@ -12,7 +12,9 @@ public enum DepotMassage {
     DEPOT_MODIFY_SUCCESS("배송지 수정 성공"),
     DEPOT_MODIFY_FAILURE("배송지 수정 실패"),
     DEPOT_DELETE_SUCCESS("배송지 삭제 성공"),
-    DEPOT_DELETE_FAILURE("배송지 삭제 실패");
+    DEPOT_DELETE_FAILURE("배송지 삭제 실패"),
+    DEPOT_GET_ALL_SUCCESS("해당 유저 전체 배송지 조회 성공"),
+    DEPOT_GET_SUCCESS("해당 유저 특정 배송지 조회 성공");
 
     private final String message;
 
