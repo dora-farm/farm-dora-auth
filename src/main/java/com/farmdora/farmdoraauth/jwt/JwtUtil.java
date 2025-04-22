@@ -1,11 +1,15 @@
 package com.farmdora.farmdoraauth.jwt;
 
 
+import com.farmdora.farmdoraauth.auth.login.RedisString.RedisKey;
+import com.farmdora.farmdoraauth.auth.login.dto.CustomUserDetail;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -40,6 +44,14 @@ public class JwtUtil {
                 .getPayload().get("userId", Integer.class);
     }
 
+    public String getUsername(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload().get("username", String.class);
+    }
+
     public Collection<? extends GrantedAuthority> getAuthorities(String token) {
        String role = Jwts.parser()
                .verifyWith(secretKey)
@@ -62,16 +74,28 @@ public class JwtUtil {
             log.error("Jwt 요효성 검사 실패: {}" , e.getMessage());
             return false;
         }
-
     }
 
-    public String createJwt(int userId, String role, Long expiredMs){
+    public String createJwt(CustomUserDetail customUserDetail, Long expiredMs){
         return Jwts.builder()
-                .claim("userId",userId)
-                .claim("role",role)
+                .claim("userId",customUserDetail.getUserId())
+                .claim("role",customUserDetail.getRole())
+                .claim("username",customUserDetail.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public String extractTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) return null;
+
+        for (Cookie cookie : cookies) {
+            if (RedisKey.cookieName.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 }

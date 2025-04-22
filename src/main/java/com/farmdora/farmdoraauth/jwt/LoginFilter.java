@@ -1,5 +1,6 @@
 package com.farmdora.farmdoraauth.jwt;
 
+import com.farmdora.farmdoraauth.auth.login.RedisString.RedisKey;
 import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
 import com.farmdora.farmdoraauth.auth.login.dto.CustomUserDetail;
@@ -32,7 +33,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final UserRepository userRepository;
 
 
     @Override
@@ -57,30 +57,28 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         log.info("로그인 성공 시 실행");
 
         CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
-        String username = customUserDetail.getUsername();
-        int userId = userRepository.findUserIdById(username);
-        log.info("로그인 유저의 프라이머리키 {}",userId);
+
+        log.info("로그인 유저의 프라이머리키 {}",customUserDetail.getUserId());
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        String role = authorities.stream().iterator().next().getAuthority();
 
-        String token = jwtUtil.createJwt(userId, role, 60 * 60 * 10L);
+        String token = jwtUtil.createJwt(customUserDetail, 60 * 60 * 10L * 1000);
 
-        if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(RedisKey.blackList + token))) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("블랙리스트에 등록된 토큰으로 로그인 시도 불가");
             return;
         }
 
         try {
-            redisTemplate.opsForValue().set("accessToken:" + userId, token, Duration.ofHours(5));
+            redisTemplate.opsForValue().set(RedisKey.accessToken + customUserDetail.getUsername(), token, Duration.ofHours(5));
         } catch (Exception e) {
             log.error("레디스 저장 오류 {}", e.getMessage());
         }
 
         //응답에 jwt 토큰 반환
         Map<String, Object> result = new HashMap<>();
-        result.put("accessToken", token);
+        result.put(RedisKey.accessToken, token);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String responseJson = objectMapper.writeValueAsString(result);

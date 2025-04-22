@@ -32,12 +32,14 @@ public class CustomOAuth2FailureHandler implements AuthenticationFailureHandler 
             String snsName = ex.getSnsName();
             String token = ex.getToken();
 
+            String username = jwtUtil.getUsername(token);
             int userId = jwtUtil.getUserId(token);
+
             try {
                 oAuthRegisterService.registerOAuth(userId, provider, snsName);
 
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userId, null, jwtUtil.getAuthorities(token));
+                        new UsernamePasswordAuthenticationToken(username, null, jwtUtil.getAuthorities(token));
                 log.info("소셜 연동 토큰 {}", token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 

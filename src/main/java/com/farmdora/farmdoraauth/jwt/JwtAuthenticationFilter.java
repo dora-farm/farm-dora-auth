@@ -1,8 +1,8 @@
 package com.farmdora.farmdoraauth.jwt;
 
+import com.farmdora.farmdoraauth.auth.login.RedisString.RedisKey;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +24,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = extractTokenFromCookie(request);
+        String token = jwtUtil.extractTokenFromCookie(request);
 
         if (token != null && jwtUtil.validateToken(token)) {
-            int userId = jwtUtil.getUserId(token);
-            log.debug("인증된 사용자: {}", userId);
+            String username = jwtUtil.getUsername(token);
+            log.debug("인증된 사용자: {}", username);
 
             // 블랙리스트 체크
-            if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(RedisKey.blackList + token))) {
                 log.warn("블랙리스트 토큰 접근 차단");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
@@ -39,23 +39,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // SecurityContext 설정
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userId, null, jwtUtil.getAuthorities(token));
+                    new UsernamePasswordAuthenticationToken(username, null, jwtUtil.getAuthorities(token));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String extractTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) return null;
-
-        for (Cookie cookie : cookies) {
-            if ("jwt_token".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-        return null;
     }
 }
 

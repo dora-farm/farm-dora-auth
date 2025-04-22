@@ -23,10 +23,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("로그인",username));
         log.info("차단여부 {}",user.isBlind());
-        if (user.isBlind()) {
-            throw new AccessDeniedException();
-        }
 
-        return new CustomUserDetail(user);
+        return new CustomUserDetail(
+                user.getUserId(),
+                user.getId(),
+                user.getPwd(),
+                user.getAuth().getRole(),
+                user.isBlind()
+        );
     }
 }

@@ -1,5 +1,7 @@
 package com.farmdora.farmdoraauth.auth.oauth.handler;
 
+import com.farmdora.farmdoraauth.auth.login.RedisString.RedisKey;
+import com.farmdora.farmdoraauth.auth.login.dto.CustomUserDetail;
 import com.farmdora.farmdoraauth.auth.oauth.service.OAuthLoginService;
 import com.farmdora.farmdoraauth.entity.User;
 import com.farmdora.farmdoraauth.jwt.JwtUtil;
@@ -41,28 +43,33 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             log.info("snsName: {}, provider: {}", snsName, provider);
 
             User user = oAuthLoginService.oauthLogin(snsName);
-            int userId = user.getUserId();
-            String role = user.getAuth().getRole();
+            CustomUserDetail customUserDetail = new CustomUserDetail(
+                    user.getUserId(),
+                    user.getId(),
+                    user.getPwd(),
+                    user.getAuth().getRole(),
+                    user.isBlind()
+            );
 
-            String token = jwtUtil.createJwt(userId, role, 60 * 60 * 10L);
+            String token = jwtUtil.createJwt(customUserDetail, 60 * 60 * 10L);
 
-            if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(RedisKey.blackList + token))) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("블랙리스트에 등록된 토큰으로 로그인 시도 불가");
                 return;
             }
 
             try {
-                redisTemplate.opsForValue().set("accessToken:" + userId, token, Duration.ofHours(5));
+                redisTemplate.opsForValue().set(RedisKey.accessToken + user.getId(), token, Duration.ofHours(5));
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            authentication = new UsernamePasswordAuthenticationToken(userId, null, jwtUtil.getAuthorities(token));
+            authentication = new UsernamePasswordAuthenticationToken(user.getId(), null, jwtUtil.getAuthorities(token));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             response.setContentType("application/json;charset=utf-8");
-            Cookie cookie = new Cookie("jwt_token", token);
+            Cookie cookie = new Cookie(RedisKey.cookieName, token);
             cookie.setHttpOnly(false);
             cookie.setSecure(false);
             cookie.setPath("/");

@@ -35,6 +35,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthUserInfo oAuthUserInfo = OAuthUserInfoFactory.getOAuthUserInfo(provider, attributes);
         String snsName = oAuthUserInfo.getProvider() + "_" + oAuthUserInfo.getProviderId();
 
+
         Object frontFromTokenObj = redisTemplate.opsForValue().get("frontFromToken");
 
         redisTemplate.delete("frontFromToken");
