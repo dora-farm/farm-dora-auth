@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/mypage/depot")
+@RequestMapping("/api/mypage/user/depot")
 public class DepotRestController {
 
     private final DepotService depotService;
