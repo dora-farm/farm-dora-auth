@@ -79,7 +79,7 @@ public class UserRestController {
         }
     }
 
-    @PutMapping("/blind")
+    @PutMapping("/expire")
     public HttpResponse blindUser(HttpServletRequest request) {
 //        String token = JwtFromCookie.extractTokenFromCookie(request);
 //        int userId = jwtUtil.getUserId(token);

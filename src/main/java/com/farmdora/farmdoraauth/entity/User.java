@@ -3,6 +3,7 @@ package com.farmdora.farmdoraauth.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -77,11 +78,12 @@ public class User extends BaseTimeEntity {
         this.phoneNum = phoneNum;
         this.bankType = bankType;
     }
+
     public void expireUser() {
         this.id = "deleted_user_" + this.userId;
         this.pwd = "";
         this.name = "탈퇴회원";
-        this.email = "deleted" + this.userId + "@example.com";
+        this.email = "deleted" + this.userId + "@blind.com";
         this.accountNum = null;
         this.address = null;
         this.birth = null;
@@ -90,5 +92,12 @@ public class User extends BaseTimeEntity {
         this.isExpire = true;
     }
 
+    public void blindUser() {
+        this.isBlind = true;
+    }
+
+    public void unblindUser() {
+        this.isBlind = false;
+    }
 
 }
