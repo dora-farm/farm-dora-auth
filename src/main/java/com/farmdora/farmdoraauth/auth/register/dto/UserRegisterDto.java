@@ -1,5 +1,6 @@
 package com.farmdora.farmdoraauth.auth.register.dto;
 
+import com.farmdora.farmdoraauth.entity.Address;
 import com.farmdora.farmdoraauth.entity.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StandardRegisterDto {
+public class UserRegisterDto {
 
     private String name;
     private String id;
@@ -24,4 +25,5 @@ public class StandardRegisterDto {
     private LocalDate birth;
     private Gender sex;
     private Short bankId;
+    private Address address;
 }

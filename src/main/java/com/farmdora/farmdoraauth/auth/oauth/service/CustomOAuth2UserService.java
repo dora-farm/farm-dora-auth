@@ -1,5 +1,6 @@
 package com.farmdora.farmdoraauth.auth.oauth.service;
 
+import com.farmdora.farmdoraauth.auth.StringKey.StringKey;
 import com.farmdora.farmdoraauth.auth.oauth.exception.CustomOAuth2Exception;
 import com.farmdora.farmdoraauth.auth.oauth.factory.OAuthUserInfoFactory;
 import com.farmdora.farmdoraauth.auth.oauth.oauthDto.OAuthUserInfo;
@@ -35,9 +36,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthUserInfo oAuthUserInfo = OAuthUserInfoFactory.getOAuthUserInfo(provider, attributes);
         String snsName = oAuthUserInfo.getProvider() + "_" + oAuthUserInfo.getProviderId();
 
-        Object frontFromTokenObj = redisTemplate.opsForValue().get("frontFromToken");
+        Object frontFromTokenObj = redisTemplate.opsForValue().get(StringKey.frontFromToken);
 
-        redisTemplate.delete("frontFromToken");
+        redisTemplate.delete(StringKey.frontFromToken);
         log.info("frontFromId: {}", frontFromTokenObj);
 
         if (frontFromTokenObj != null) {

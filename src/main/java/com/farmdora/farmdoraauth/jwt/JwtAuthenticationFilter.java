@@ -2,7 +2,6 @@ package com.farmdora.farmdoraauth.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = JwtFromCookie.extractTokenFromCookie(request);
+        String token = jwtUtil.extractTokenFromCookie(request);
 
         if (token != null && jwtUtil.validateToken(token)) {
             int userId = jwtUtil.getUserId(token);
@@ -37,6 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
+
             // SecurityContext 설정
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userId, null, jwtUtil.getAuthorities(token));
@@ -46,4 +46,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-

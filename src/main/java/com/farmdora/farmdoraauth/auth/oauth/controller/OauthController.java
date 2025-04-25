@@ -1,6 +1,8 @@
 package com.farmdora.farmdoraauth.auth.oauth.controller;
 
+import com.farmdora.farmdoraauth.auth.StringKey.StringKey;
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
+import com.farmdora.farmdoraauth.jwt.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,25 +22,16 @@ public class OauthController {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final Environment env;
-    private static final String COOKIE_NAME = "jwt_token";
-    private static final String REDIS_KEY = "frontFromToken";
-    private static final String SOCIAL_PROVIDER_KEY = "provider";
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/id/save")
     public HttpResponse idSave(@RequestBody Map<String, String> map, HttpServletRequest request) {
-        String provider = map.get(SOCIAL_PROVIDER_KEY);
-        Cookie[] cookies = request.getCookies();
-        String token = "";
-        log.info("idSave {}", provider);
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(COOKIE_NAME)) {
-                    token = cookie.getValue();
-                }
-            }
-        }
+        String provider = map.get(StringKey.provider);
+        String token = jwtUtil.extractTokenFromCookie(request);
 
-        redisTemplate.opsForValue().set(REDIS_KEY, token, Duration.ofMinutes(5));
+        log.info("idSave {}", provider);
+
+        redisTemplate.opsForValue().set(StringKey.frontFromToken, token, Duration.ofMinutes(5));
 
         String redirectUrl = env.getProperty("social.redirect.url") + provider;
         log.info("redirectUrl = {}", redirectUrl);

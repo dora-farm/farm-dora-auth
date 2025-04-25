@@ -1,5 +1,6 @@
 package com.farmdora.farmdoraauth.auth.oauth.handler;
 
+import com.farmdora.farmdoraauth.auth.StringKey.StringKey;
 import com.farmdora.farmdoraauth.auth.oauth.service.OAuthLoginService;
 import com.farmdora.farmdoraauth.entity.User;
 import com.farmdora.farmdoraauth.jwt.JwtUtil;
@@ -44,7 +45,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             int userId = user.getUserId();
             String role = user.getAuth().getRole();
 
-            String token = jwtUtil.createJwt(userId, role, 60 * 60 * 10L);
+            String token = jwtUtil.createJwt(userId, role, user.getId(),60 * 60 * 10L * 1000);
 
             if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -53,7 +54,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             }
 
             try {
-                redisTemplate.opsForValue().set("accessToken:" + userId, token, Duration.ofHours(5));
+                redisTemplate.opsForValue().set(StringKey.accessToken + userId, token, Duration.ofHours(5));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -72,7 +73,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             response.sendRedirect("http://localhost:5173/");
         }catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_FOUND);
-            response.sendRedirect("http://localhost:5173/login?error=oauthLogin");
+            response.sendRedirect("http://localhost:5173/login?error=oauthlogin");
         }
     }
 }

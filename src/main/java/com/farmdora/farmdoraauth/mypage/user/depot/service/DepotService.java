@@ -59,7 +59,7 @@ public class DepotService {
         if (depot.isDefault()) {
             depotRepository.updateIsDefaultToFalse(user.getUserId());
         }
-
+        log.info("배송지 저장 {}", depot);
         // Depot 엔티티 저장
         depotRepository.save(depot);
     }

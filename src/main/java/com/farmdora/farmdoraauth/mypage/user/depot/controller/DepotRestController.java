@@ -62,7 +62,7 @@ public class DepotRestController {
 //            String token = JwtFromCookie.extractTokenFromCookie(request);
 //            int userId = jwtUtil.getUserId(token);
 //
-//            registerRequest.setUserId(userId);
+            registerRequest.setUserId(21);
             depotService.registerDepot(registerRequest);
 
             return HttpResponse.builder()

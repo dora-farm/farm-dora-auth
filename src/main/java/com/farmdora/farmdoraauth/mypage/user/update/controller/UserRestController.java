@@ -1,9 +1,6 @@
 package com.farmdora.farmdoraauth.mypage.user.update.controller;
 
-import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
-import com.farmdora.farmdoraauth.entity.User;
-import com.farmdora.farmdoraauth.jwt.JwtFromCookie;
 import com.farmdora.farmdoraauth.jwt.JwtUtil;
 import com.farmdora.farmdoraauth.mypage.user.update.dto.UserModifyDto;
 import com.farmdora.farmdoraauth.mypage.user.update.dto.UserSelectDto;

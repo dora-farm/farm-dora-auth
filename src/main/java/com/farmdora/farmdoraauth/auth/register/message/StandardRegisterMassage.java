@@ -12,7 +12,8 @@ public enum StandardRegisterMassage {
     EMAIL_SEND_SUCCESS("이메일 전송 성공하였습니다."),
     EMAIL_VERIFY_SUCCESS("이메일 인증 성공하였습니다."),
     EMAIL_VERIFY_FAIL("이메일 인증 실패하였습니다."),
-    USER_REGISTER_SUCCESS("유저 등록 성공하였습니다.")
+    USER_REGISTER_SUCCESS("유저 등록 성공하였습니다."),
+    SELLER_REGISTER_SUCCESS("판매자 신청 성공하였습니다.")
     ;
 
     private final String message;

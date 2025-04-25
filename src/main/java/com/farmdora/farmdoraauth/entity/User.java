@@ -67,6 +67,11 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "bank_id")
     private BankType bankType;
 
+    public void changeAuth(Auth auth) {
+        this.auth = auth;
+    }
+
+
     public void updateUserInfo(String pwd, String accountNum, LocalDate birth, Address address,
                                String email, Gender sex, String phoneNum, BankType bankType) {
         this.pwd = pwd;

@@ -3,7 +3,7 @@ package com.farmdora.farmdoraauth.auth.find.service;
 import com.farmdora.farmdoraauth.auth.find.findenum.FindType;
 import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import com.farmdora.farmdoraauth.auth.register.service.EmailSendService;
-import com.farmdora.farmdoraauth.auth.register.service.StandardRegisterService;
+import com.farmdora.farmdoraauth.auth.register.service.UserRegisterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,7 +21,7 @@ public class FindService {
 
     private final EmailSendService emailSendService;
     private final UserRepository userRepository;
-    private final StandardRegisterService standardRegisterService;
+    private final UserRegisterService userRegisterService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private static final String pool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -38,7 +38,7 @@ public class FindService {
         String sub = findType.getSubject();
         String emailBody = getEmailBody(findType, email); // 분리된 메서드 호출
         log.info("service sendFind() email: {}", email);
-        if (standardRegisterService.verifyEmail(email, code)) {
+        if (userRegisterService.verifyEmail(email, code)) {
             emailSendService.sendEmail(email, sub, emailBody, findType.getTitle(), findType.getContent());
             return true;
         } else {

@@ -1,7 +1,8 @@
 package com.farmdora.farmdoraauth.auth.register.repository;
 
-import com.farmdora.farmdoraauth.entity.Sns;
+import com.farmdora.farmdoraauth.entity.Seller;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface SnsRegisterRepository extends JpaRepository<Sns, Short> {
+public interface SellerRepository extends JpaRepository<Seller, Integer> {
+
 }

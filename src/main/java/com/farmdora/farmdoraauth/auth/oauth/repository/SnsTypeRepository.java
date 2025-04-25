@@ -1,4 +1,4 @@
-package com.farmdora.farmdoraauth.auth.register.repository;
+package com.farmdora.farmdoraauth.auth.oauth.repository;
 
 import com.farmdora.farmdoraauth.entity.SnsType;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -4,7 +4,7 @@ import com.farmdora.farmdoraauth.auth.find.dto.FindDto;
 import com.farmdora.farmdoraauth.auth.find.dto.SendDto;
 import com.farmdora.farmdoraauth.auth.find.service.FindService;
 import com.farmdora.farmdoraauth.auth.register.message.StandardRegisterMassage;
-import com.farmdora.farmdoraauth.auth.register.service.StandardRegisterService;
+import com.farmdora.farmdoraauth.auth.register.service.UserRegisterService;
 import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/find")
+@RequestMapping("/api/find")
 public class FindRestController {
 
     private final FindService findService;
-    private final StandardRegisterService standardRegisterService;
+    private final UserRegisterService userRegisterService;
     private static final String EMAIL_SUB = "이메일 인증";
     private static final String EMAIL_TITLE = "이메일 인증 요청";
     private static final String EMAIL_CONTENT = "안녕하세요! 아래의 인증 코드를 일력하여 인증을 완료하세요:";
@@ -28,7 +28,7 @@ public class FindRestController {
         String email = request.getEmail();
         boolean isEmail = findService.existEmail(email, request.getId(), request.getName());
         if (isEmail) {
-            standardRegisterService.sendVerificationEmail(email, EMAIL_SUB, EMAIL_TITLE, EMAIL_CONTENT);
+            userRegisterService.sendVerificationEmail(email, EMAIL_SUB, EMAIL_TITLE, EMAIL_CONTENT);
             return HttpResponse.builder()
                     .status(200)
                     .message(StandardRegisterMassage.EMAIL_SEND_SUCCESS.getMessage())

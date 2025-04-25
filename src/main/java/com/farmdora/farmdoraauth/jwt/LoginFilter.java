@@ -64,7 +64,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String role = authorities.stream().iterator().next().getAuthority();
 
-        String token = jwtUtil.createJwt(userId, role, 60 * 60 * 10L);
+        String token = jwtUtil.createJwt(userId, role, username, 60 * 60 * 10L * 1000);
 
         if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token))) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

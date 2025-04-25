@@ -2,7 +2,7 @@ package com.farmdora.farmdoraauth.auth.register.service;
 
 import com.farmdora.farmdoraauth.common.exception.ResourceAlreadyExistsException;
 import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
-import com.farmdora.farmdoraauth.auth.register.dto.StandardRegisterDto;
+import com.farmdora.farmdoraauth.auth.register.dto.UserRegisterDto;
 import com.farmdora.farmdoraauth.entity.*;
 import com.farmdora.farmdoraauth.auth.register.repository.BankTypeRepository;
 import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
@@ -19,7 +19,7 @@ import java.util.Random;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class StandardRegisterService {
+public class UserRegisterService {
 
     private final UserRepository userRepository;
     private final BankTypeRepository bankTypeRepository;
@@ -59,30 +59,35 @@ public class StandardRegisterService {
         return isValid;
     }
 
-    public boolean registerUser(StandardRegisterDto standardRegisterDto) {
-        standardRegisterDto.setAuthId((short) 3);
+    public boolean registerUser(UserRegisterDto userRegisterDto) {
+        userRegisterDto.setAuthId((short) 3);
 
-        BankType bankType = bankTypeRepository.findById(standardRegisterDto.getBankId())
-                .orElseThrow(() -> new ResourceNotFoundException("BankType Entity", standardRegisterDto.getBankId()));
+        BankType bankType = bankTypeRepository.findById(userRegisterDto.getBankId())
+                .orElseThrow(() -> new ResourceNotFoundException("BankType Entity", userRegisterDto.getBankId()));
 
-        standardRegisterDto.setBankId(bankType.getId());
+        userRegisterDto.setBankId(bankType.getId());
 
-        String encodedPwd = bCryptPasswordEncoder.encode(standardRegisterDto.getPwd());
+        String encodedPwd = bCryptPasswordEncoder.encode(userRegisterDto.getPwd());
 
-        standardRegisterDto.setPwd(encodedPwd);
+        userRegisterDto.setPwd(encodedPwd);
 
         User user = User.builder()
-                .id(standardRegisterDto.getId())
-                .pwd(standardRegisterDto.getPwd())
-                .name(standardRegisterDto.getName())
-                .email(standardRegisterDto.getEmail())
-                .accountNum(standardRegisterDto.getAccountNum())
-                .birth(standardRegisterDto.getBirth())
-                .sex(standardRegisterDto.getSex())
-                .phoneNum(standardRegisterDto.getPhoneNum())
+                .id(userRegisterDto.getId())
+                .pwd(userRegisterDto.getPwd())
+                .name(userRegisterDto.getName())
+                .email(userRegisterDto.getEmail())
+                .accountNum(userRegisterDto.getAccountNum())
+                .birth(userRegisterDto.getBirth())
+                .sex(userRegisterDto.getSex())
+                .phoneNum(userRegisterDto.getPhoneNum())
                 .bankType(bankType)
+                .address(Address.builder()
+                        .addr(userRegisterDto.getAddress().getAddr())
+                        .postNum(userRegisterDto.getAddress().getPostNum())
+                        .detailAddr(userRegisterDto.getAddress().getDetailAddr())
+                        .build())
                 .auth(Auth.builder()
-                        .id(standardRegisterDto.getAuthId())
+                        .id(userRegisterDto.getAuthId())
                         .build())
                 .isExpire(false)
                 .isBlind(false)
