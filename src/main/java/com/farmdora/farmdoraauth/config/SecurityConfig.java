@@ -1,8 +1,12 @@
 package com.farmdora.farmdoraauth.config;
 
+import com.farmdora.farmdoraauth.auth.oauth.handler.CustomOAuth2FailureHandler;
+import com.farmdora.farmdoraauth.auth.oauth.handler.CustomOAuth2SuccessHandler;
+import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import com.farmdora.farmdoraauth.jwt.JwtAuthenticationFilter;
 import com.farmdora.farmdoraauth.jwt.JwtUtil;
 import com.farmdora.farmdoraauth.jwt.LoginFilter;
+import com.farmdora.farmdoraauth.auth.oauth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +24,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -33,6 +35,9 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final CustomOAuth2SuccessHandler oAuth2SuccessHandler;
+    private final CustomOAuth2FailureHandler oAuth2FailureHandler;
+    private final UserRepository userRepository;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -56,10 +61,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth)->
                         auth.requestMatchers("/**").permitAll()
                                 .anyRequest().permitAll())
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,redisTemplate),
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,redisTemplate,userRepository),
                         UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo ->
+                                userInfo.userService(new CustomOAuth2UserService(redisTemplate)))
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler)
+                )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, redisTemplate),
                         UsernamePasswordAuthenticationFilter.class)
+
                 .sessionManagement((session)->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
@@ -69,7 +81,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList(("http://localhost:5173"))); // 허용할 도메인
+        configuration.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:5174")); // 허용할 도메인
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*")); // 모든 요청 헤더를 수락한다.
         configuration.setAllowCredentials(true);

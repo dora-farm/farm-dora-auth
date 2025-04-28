@@ -1,9 +1,9 @@
 package com.farmdora.farmdoraauth.entity;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -66,5 +66,43 @@ public class User extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bank_id")
     private BankType bankType;
+
+    public void changeAuth(Auth auth) {
+        this.auth = auth;
+    }
+
+
+    public void updateUserInfo(String pwd, String accountNum, LocalDate birth, Address address,
+                               String email, Gender sex, String phoneNum, BankType bankType) {
+        this.pwd = pwd;
+        this.accountNum = accountNum;
+        this.birth = birth;
+        this.address = address;
+        this.email = email;
+        this.sex = sex;
+        this.phoneNum = phoneNum;
+        this.bankType = bankType;
+    }
+
+    public void expireUser() {
+        this.id = "deleted_user_" + this.userId;
+        this.pwd = "";
+        this.name = "탈퇴회원";
+        this.email = "deleted" + this.userId + "@blind.com";
+        this.accountNum = null;
+        this.address = null;
+        this.birth = null;
+        this.sex = null;
+        this.phoneNum = null;
+        this.isExpire = true;
+    }
+
+    public void blindUser() {
+        this.isBlind = true;
+    }
+
+    public void unblindUser() {
+        this.isBlind = false;
+    }
 
 }

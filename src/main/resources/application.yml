@@ -5,32 +5,3 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ENC(EWyx+8ksOrBo7/t4Nvoy6cv0myaztm5lYV5mVgpXPA0=)
-    password: ENC(tuWsz1QaQJK+vq71KVwzF/b04GpXUNHh+qiBhSnYH/c=)
-    properties:
-      smtp:
-        auth: true
-        starttls:
-          enable: true
-          required: true
-        connection-timeout: 5000
-        timeout: 5000
-        write-timeout: 5000
-      auth-code-expiration-millis: 1800000
-
-  data:
-    redis:
-      port: 6379
-      host: ENC(nj998P/iLMkTy602U0MI3bLVj6BYoBkQ)
-
-  jwt.secret: ENC(AJv6LokZXWCLSDdDEFT1UGe19935JohjmPnbyDPFNQWa+WgVgEaBrsg3Fo8Xo8Myj3KHBd5e5Ka5pLS8nyOm2NNBdvwSAbjfBlpcZENOkyA=)
-
-jasypt:
-  encryptor:
-    password: ${key}
-    bean: jasyptEncryptor
-

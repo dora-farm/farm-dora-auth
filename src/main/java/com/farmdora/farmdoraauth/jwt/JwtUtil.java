@@ -3,13 +3,15 @@ package com.farmdora.farmdoraauth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -22,7 +24,7 @@ import java.util.List;
 @Slf4j
 public class JwtUtil {
 
-    private SecretKey secretKey;
+    private final SecretKey secretKey;
 
     public JwtUtil(@Value("${spring.jwt.secret}") String secret) {
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
@@ -32,12 +34,12 @@ public class JwtUtil {
                         .getAlgorithm());
     }
 
-    public String getUsername(String token) {
+    public Integer getUserId(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
-                .getPayload().get("username", String.class);
+                .getPayload().get("userId", Integer.class);
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities(String token) {
@@ -62,12 +64,11 @@ public class JwtUtil {
             log.error("Jwt 요효성 검사 실패: {}" , e.getMessage());
             return false;
         }
-
     }
 
-    public String createJwt(String username, String role, Long expiredMs){
+    public String createJwt(int userId, String role, String username,Long expiredMs){
         return Jwts.builder()
-                .claim("username",username)
+                .claim("userId",userId)
                 .claim("role",role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
@@ -75,4 +76,23 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String extractTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null) return null;
+
+        for (Cookie cookie : cookies) {
+            if ("jwt_token".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+    public int extractUserIdFromContextHolder() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return (int) authentication.getPrincipal();
+        }
+        return 0;
+    }
 }
