@@ -2,7 +2,6 @@ package com.farmdora.farmdoraauth.mypage.user.depot.controller;
 
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
 import com.farmdora.farmdoraauth.jwt.JwtUtil;
-import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotDeleteDto;
 import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotModifyRequestDto;
 import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotRegisterRequestDto;
 import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotSelectResponseDto;
@@ -36,8 +35,12 @@ public class DepotRestController {
 //                .build();
 //    }
 
-    @GetMapping("/all/{userId}")
-    public HttpResponse getDepotById(@PathVariable int userId) {
+    @GetMapping("/all")
+    public HttpResponse getDepotById() {
+
+        int userId= jwtUtil.extractUserIdFromContextHolder();
+        log.info("getDepotById: userid:{}",userId);
+
         List<DepotSelectResponseDto> depotList = depotService.getDepotsByUserId(userId);
         return HttpResponse.builder()
                 .status(200)
@@ -62,7 +65,9 @@ public class DepotRestController {
 //            String token = JwtFromCookie.extractTokenFromCookie(request);
 //            int userId = jwtUtil.getUserId(token);
 //
-            registerRequest.setUserId(21);
+            int userId= jwtUtil.extractUserIdFromContextHolder();
+
+            registerRequest.setUserId(userId);
             depotService.registerDepot(registerRequest);
 
             return HttpResponse.builder()
@@ -81,6 +86,7 @@ public class DepotRestController {
 
     @PutMapping("/modify")
     public HttpResponse modifyDepot(@RequestBody DepotModifyRequestDto modifyRequest) {
+
         try {
             depotService.modifyDepot(modifyRequest);
             return HttpResponse.builder()

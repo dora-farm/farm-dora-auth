@@ -51,7 +51,7 @@ public class FindRestController {
                     .build();
         }else {
             return HttpResponse.builder()
-                    .status(200)
+                    .status(500)
                     .message(StandardRegisterMassage.EMAIL_VERIFY_FAIL.getMessage())
                     .data(false)
                     .build();
