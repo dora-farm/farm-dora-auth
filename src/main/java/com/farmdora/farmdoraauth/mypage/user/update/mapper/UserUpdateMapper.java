@@ -30,10 +30,8 @@ public class UserUpdateMapper {
         user.updateUserInfo(
                 userModifyDto.getPwd(),
                 userModifyDto.getAccountNum(),
-                userModifyDto.getBirth(),
                 userModifyDto.getAddress(),
                 userModifyDto.getEmail(),
-                userModifyDto.getSex(),
                 userModifyDto.getPhoneNum(),
                 bankType
         );

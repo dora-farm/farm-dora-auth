@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public interface NCPStorageService {
-    void upload(String filePath, InputStream fileIn);
+    void upload(String filePath, InputStream fileIn, long size);
 
 
 

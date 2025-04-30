@@ -54,10 +54,12 @@ public class NCPObjectStorageService implements NCPStorageService {
 
 
     @Override
-    public void upload(String filePath, InputStream fileIn) {
+    public void upload(String filePath, InputStream fileIn, long fileSize) {
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType("application/x-directory");
+        objectMetadata.setContentLength(fileSize); // ✅ 필수
+        objectMetadata.setContentType("application/octet-stream"); // 또는 실제 타입
+
         filePath ="seller/" + filePath;
 
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, filePath, fileIn, objectMetadata);

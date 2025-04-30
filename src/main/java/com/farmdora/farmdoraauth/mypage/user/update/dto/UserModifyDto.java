@@ -18,8 +18,6 @@ public class UserModifyDto {
     private String phoneNum;
     private String email;
     private String accountNum;
-    private LocalDate birth;
-    private Gender sex;
     private short bankId;
     private Address address;
 }

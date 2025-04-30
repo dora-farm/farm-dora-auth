@@ -27,7 +27,6 @@ public class UserUpdateService {
     public boolean verifyPassword(int userId, String rawPassword) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다", userId));
-
         return bCryptPasswordEncoder.matches(rawPassword, user.getPwd());
     }
 
@@ -39,7 +38,16 @@ public class UserUpdateService {
     public void updateUser(int userId, UserModifyDto userModifyDto) {
 
         User existUser = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("유저 수정", userId));
-        userModifyDto.setPwd(bCryptPasswordEncoder.encode(userModifyDto.getPwd()));
+
+        if(userModifyDto.getPwd() == null){
+            userModifyDto.setPwd(existUser.getPwd());
+        }else {
+            userModifyDto.setPwd(bCryptPasswordEncoder.encode(userModifyDto.getPwd()));
+        }
+
+        if (userModifyDto.getEmail() == null){
+            userModifyDto.setEmail(existUser.getEmail());
+        }
 
         BankType bankType = bankTypeRepository.findById(userModifyDto.getBankId())
                 .orElseThrow(()-> new ResourceNotFoundException("유저 수정 중 banktype 조회",userModifyDto.getBankId()));
@@ -49,10 +57,9 @@ public class UserUpdateService {
         userRepository.save(existUser);
     }
 
-    public void blindUser(int userId) {
+    public void expireUser(int userId) {
         User existUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("회원 탈퇴", userId));
         existUser.expireUser();
-
     }
 }

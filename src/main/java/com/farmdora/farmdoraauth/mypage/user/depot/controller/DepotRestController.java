@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @Slf4j
@@ -36,10 +37,9 @@ public class DepotRestController {
 //    }
 
     @GetMapping("/all")
-    public HttpResponse getDepotById() {
+    public HttpResponse getDepotById(Principal principal) {
 
-        int userId= jwtUtil.extractUserIdFromContextHolder();
-        log.info("getDepotById: userid:{}",userId);
+        Integer userId = Integer.parseInt(principal.getName());
 
         List<DepotSelectResponseDto> depotList = depotService.getDepotsByUserId(userId);
         return HttpResponse.builder()
@@ -60,13 +60,12 @@ public class DepotRestController {
     }
 
     @PostMapping("/register")
-    public HttpResponse saveDepot(@RequestBody DepotRegisterRequestDto registerRequest, HttpServletRequest request) {
+    public HttpResponse saveDepot(Principal principal ,@RequestBody DepotRegisterRequestDto registerRequest) {
         try {
 //            String token = JwtFromCookie.extractTokenFromCookie(request);
 //            int userId = jwtUtil.getUserId(token);
 //
-            int userId= jwtUtil.extractUserIdFromContextHolder();
-
+            Integer userId = Integer.parseInt(principal.getName());
             registerRequest.setUserId(userId);
             depotService.registerDepot(registerRequest);
 
