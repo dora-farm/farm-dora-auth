@@ -72,14 +72,12 @@ public class User extends BaseTimeEntity {
     }
 
 
-    public void updateUserInfo(String pwd, String accountNum, LocalDate birth, Address address,
-                               String email, Gender sex, String phoneNum, BankType bankType) {
+    public void updateUserInfo(String pwd, String accountNum, Address address,
+                               String email, String phoneNum, BankType bankType) {
         this.pwd = pwd;
         this.accountNum = accountNum;
-        this.birth = birth;
         this.address = address;
         this.email = email;
-        this.sex = sex;
         this.phoneNum = phoneNum;
         this.bankType = bankType;
     }

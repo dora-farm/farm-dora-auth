@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -27,7 +28,15 @@ public class OauthController {
     @PostMapping("/id/save")
     public HttpResponse idSave(@RequestBody Map<String, String> map, HttpServletRequest request) {
         String provider = map.get(StringKey.provider);
-        String token = jwtUtil.extractTokenFromCookie(request);
+
+        String authorizationHeader = request.getHeader("Authorization");
+        String token = null;
+
+        if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.replace("Bearer ", "").trim();
+        }else {
+            throw new RuntimeException("연동 실패");
+        }
 
         log.info("idSave {}", provider);
 

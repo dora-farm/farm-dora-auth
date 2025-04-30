@@ -27,15 +27,17 @@ public class UserRestController {
 
     @PostMapping("/verify")
     public HttpResponse verifyPassword(@RequestBody VerifyPasswordDto password, HttpServletRequest request) {
-        String token = jwtUtil.extractTokenFromCookie(request);
-        int userId = jwtUtil.getUserId(token);
+//        String token = jwtUtil.extractTokenFromCookie(request);
+//        int userId = jwtUtil.getUserId(token);
 //        int userId=5;
-        if (userUpdateService.verifyPassword(userId, password.getPassword())) {
-        return HttpResponse.builder()
-                .status(200)
-                .message(UserUpdateMassage.PASSWORD_VERIFY_SUCCESS.getMessage())
-                .data(true)
-                .build();
+
+        int userId = jwtUtil.extractUserIdFromContextHolder();
+        if (userUpdateService.verifyPassword(userId, password.getPwd())) {
+            return HttpResponse.builder()
+                    .status(200)
+                    .message(UserUpdateMassage.PASSWORD_VERIFY_SUCCESS.getMessage())
+                    .data(true)
+                    .build();
         } else {
             return HttpResponse.builder()
                     .status(200)
@@ -44,10 +46,11 @@ public class UserRestController {
                     .build();
         }
     }
+
     @GetMapping("/detail")
     public HttpResponse detail(HttpServletRequest request) {
-        String token = jwtUtil.extractTokenFromCookie(request);
-        int userId = jwtUtil.getUserId(token);
+        int userId = jwtUtil.extractUserIdFromContextHolder();
+        log.info("유저 수정 {}", userId);
 //        int userId=5;
         UserSelectDto user = userUpdateService.getUserById(userId);
         return HttpResponse.builder()
@@ -62,8 +65,8 @@ public class UserRestController {
 //        String token = jwtUtil.extractTokenFromCookie(request);
 //        int userId = jwtUtil.getUserId(token);
 
-        int userId = 17;
-        try{
+        int userId = jwtUtil.extractUserIdFromContextHolder();
+        try {
             userUpdateService.updateUser(userId, userModifyDto);
             return HttpResponse.builder()
                     .status(200)
@@ -80,11 +83,19 @@ public class UserRestController {
     }
 
     @PutMapping("/expire")
-    public HttpResponse blindUser(HttpServletRequest request) {
+    public HttpResponse expireUser(@RequestBody VerifyPasswordDto password) {
 //        String token = JwtFromCookie.extractTokenFromCookie(request);
 //        int userId = jwtUtil.getUserId(token);
-        int userId = 17;
-        userUpdateService.blindUser(userId);
+        int userId = jwtUtil.extractUserIdFromContextHolder();
+        if (userUpdateService.verifyPassword(userId, password.getPwd())) {
+            userUpdateService.expireUser(userId);
+        }else {
+            return HttpResponse.builder()
+                    .status(200)
+                    .message(UserUpdateMassage.PASSWORD_VERIFY_FAILURE.getMessage())
+                    .data(false)
+                    .build();
+        }
         return HttpResponse.builder()
                 .status(200)
                 .message(UserUpdateMassage.USER_EXPIRE_SUCCESS.getMessage())

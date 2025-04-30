@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
@@ -23,7 +24,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = jwtUtil.extractTokenFromCookie(request);
+        String authorizationHeader = request.getHeader("Authorization");
+        String token = null;
+
+        if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.replace("Bearer ", "").trim();
+        }
+
 
         if (token != null && jwtUtil.validateToken(token)) {
             int userId = jwtUtil.getUserId(token);

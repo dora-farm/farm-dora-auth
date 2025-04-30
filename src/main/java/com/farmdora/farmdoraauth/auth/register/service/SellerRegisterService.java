@@ -38,7 +38,7 @@ public class SellerRegisterService {
         userRepository.save(user);
 
         try {
-            ncpStorageService.upload(saveFile,file.getInputStream());
+            ncpStorageService.upload(saveFile,file.getInputStream(), file.getSize());
 
             Seller seller = sellerEntityMapper.toSellerEntity(user, dto, saveFile , file);
 

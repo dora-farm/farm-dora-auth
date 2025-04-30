@@ -10,10 +10,12 @@ import com.farmdora.farmdoraauth.auth.register.service.UserRegisterService;
 import com.farmdora.farmdoraauth.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -96,10 +98,10 @@ public class RegisterRestController {
                 .build();
     }
     @PostMapping("/seller")
-    public HttpResponse registerAdmin(@RequestPart("seller") SellerRegisterDto sellerRegisterDto,
-                                      @RequestPart("file") MultipartFile file) {
+    public HttpResponse registerSeller(Principal principal, @RequestPart("seller") SellerRegisterDto sellerRegisterDto,
+                                       @RequestPart("file") MultipartFile file) {
 
-        int userId = 5;
+        Integer userId = Integer.parseInt(principal.getName());
 
         sellerRegisterService.registerSeller(userId, sellerRegisterDto, file);
 
