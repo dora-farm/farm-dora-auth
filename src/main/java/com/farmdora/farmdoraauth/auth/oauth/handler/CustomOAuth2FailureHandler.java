@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +24,7 @@ public class CustomOAuth2FailureHandler implements AuthenticationFailureHandler 
 
     private final OAuthRegisterService oAuthRegisterService;
     private final JwtUtil jwtUtil;
+    private final Environment env;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
@@ -41,10 +43,10 @@ public class CustomOAuth2FailureHandler implements AuthenticationFailureHandler 
                 log.info("소셜 연동 토큰 {}", token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                response.sendRedirect("http://localhost:5173");
+                response.sendRedirect(env.getProperty("front.redirect.url"));
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_FOUND);
-                response.sendRedirect("http://localhost:5173/my/user/profile?error=oauthregister");
+                response.sendRedirect(env.getProperty("front.redirect.url")+"my/user/profile?error=oauthregister");
             }
         }
     }

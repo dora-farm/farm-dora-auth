@@ -1,6 +1,8 @@
 package com.farmdora.farmdoraauth.auth.register.repository;
 
+import com.farmdora.farmdoraauth.entity.Address;
 import com.farmdora.farmdoraauth.entity.User;
+import com.farmdora.farmdoraauth.mypage.user.depot.dto.UserAddressDto;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,4 +32,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsUserByEmailAndId(String email,String id);
 
     boolean existsUserByEmailAndName(String email, String name);
+
+    @Query("SELECT new com.farmdora.farmdoraauth.mypage.user.depot.dto.UserAddressDto(u.name, u.phoneNum, u.address) FROM User u WHERE u.userId = :userId")
+    UserAddressDto findUserAddressByUserId(@Param("userId") Integer userId);
+
+
 }

@@ -39,7 +39,7 @@ public class UserUpdateService {
 
         User existUser = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("유저 수정", userId));
 
-        if(userModifyDto.getPwd() == null){
+        if(userModifyDto.getPwd() == null || userModifyDto.getPwd().isEmpty()) {
             userModifyDto.setPwd(existUser.getPwd());
         }else {
             userModifyDto.setPwd(bCryptPasswordEncoder.encode(userModifyDto.getPwd()));

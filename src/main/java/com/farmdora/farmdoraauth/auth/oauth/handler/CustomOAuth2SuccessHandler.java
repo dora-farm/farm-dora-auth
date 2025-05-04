@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private final JwtUtil jwtUtil;
     private final RedisTemplate redisTemplate;
     private final OAuthLoginService oAuthLoginService;
+    private final Environment env;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -70,10 +72,10 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             cookie.setDomain("localhost");
             cookie.setMaxAge(60 * 60 * 5);
             response.addCookie(cookie);
-            response.sendRedirect("http://localhost:5173/");
+            response.sendRedirect(env.getProperty("front.redirect.url"));
         }catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_FOUND);
-            response.sendRedirect("http://localhost:5173/login?error=oauthlogin");
+            response.sendRedirect(env.getProperty("front.redirect.url")+"login?error=oauthlogin");
         }
     }
 }

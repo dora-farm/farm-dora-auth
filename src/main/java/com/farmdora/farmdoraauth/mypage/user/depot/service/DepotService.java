@@ -2,12 +2,10 @@ package com.farmdora.farmdoraauth.mypage.user.depot.service;
 
 import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
+import com.farmdora.farmdoraauth.entity.Address;
 import com.farmdora.farmdoraauth.entity.Depot;
 import com.farmdora.farmdoraauth.entity.User;
-import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotDeleteDto;
-import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotModifyRequestDto;
-import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotRegisterRequestDto;
-import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotSelectResponseDto;
+import com.farmdora.farmdoraauth.mypage.user.depot.dto.*;
 import com.farmdora.farmdoraauth.mypage.user.depot.mapper.DepotMapper;
 import com.farmdora.farmdoraauth.mypage.user.depot.repository.DepotRepository;
 import lombok.RequiredArgsConstructor;
@@ -89,4 +87,7 @@ public class DepotService {
         depotRepository.deleteById(depotId);
     }
 
+    public UserAddressDto getUserAddr(Integer userId) {
+        return userRepository.findUserAddressByUserId(userId);
+    }
 }

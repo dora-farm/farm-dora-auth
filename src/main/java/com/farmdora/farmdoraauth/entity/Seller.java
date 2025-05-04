@@ -52,4 +52,8 @@ public class Seller {
 
     @Column(nullable = false)
     private boolean isApprove;
+
+    public void approveSeller() {
+        this.isApprove = true;
+    }
 }
