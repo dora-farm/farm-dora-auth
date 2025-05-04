@@ -2,12 +2,14 @@ package com.farmdora.farmdoraauth.jwt;
 
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -75,24 +77,32 @@ public class JwtUtil {
                 .signWith(secretKey)
                 .compact();
     }
-
-    public String extractTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies == null) return null;
-
-        for (Cookie cookie : cookies) {
-            if ("jwt_token".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-        return null;
+    private Jws<Claims> parseJws(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token);
     }
+
+    private Claims parseClaims(String token) {
+        return parseJws(token).getPayload();
+    }
+
+    public long getExpiration(String token) {
+        Claims claims = parseClaims(token);
+        long remaining = claims.getExpiration().getTime() - System.currentTimeMillis();
+        return Math.max(remaining, 0);
+    }
+
     public int extractUserIdFromContextHolder() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            return (int) authentication.getPrincipal();
+        if (authentication != null && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof Integer) {
+                return (Integer) principal;
+            }
         }
-        return 0;
+        return -1;
     }
 }

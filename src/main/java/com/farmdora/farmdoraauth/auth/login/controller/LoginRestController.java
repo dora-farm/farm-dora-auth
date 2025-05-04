@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
 import java.time.Duration;
 
 @Slf4j
@@ -28,7 +30,9 @@ public class LoginRestController {
 
 
     @PostMapping("/logout")
-    public HttpResponse logout(HttpServletRequest request) {
+    public HttpResponse logout( HttpServletRequest request) {
+        System.out.println(request.getHeader("Authorization"));
+        System.out.println("로그아웃 실팬");
         return loginService.logout(request);
     }
 }

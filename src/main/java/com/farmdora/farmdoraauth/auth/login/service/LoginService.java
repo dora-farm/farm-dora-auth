@@ -1,17 +1,19 @@
 package com.farmdora.farmdoraauth.auth.login.service;
 
 import com.farmdora.farmdoraauth.auth.StringKey.StringKey;
-import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
 import com.farmdora.farmdoraauth.jwt.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 
 @Slf4j
@@ -23,38 +25,64 @@ public class LoginService {
     private final JwtUtil jwtUtil;
 
     public HttpResponse logout(HttpServletRequest request) {
-        String token = jwtUtil.extractTokenFromCookie(request);
-        if (token == null) {
-            throw new ResourceNotFoundException("JWT 쿠키", HttpStatus.UNAUTHORIZED);
-        }
-
         try {
+            String token = extractToken(request);
+            System.out.println("로그아웃 토큰"+token);
+            if (token == null) {
+                return HttpResponse.builder()
+                        .status(HttpStatus.UNAUTHORIZED.value())
+                        .message("유효한 토큰이 없습니다.")
+                        .build();
+            }
+
+            // SecurityContext에서 사용자 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String username = authentication != null ? authentication.getName() : "알 수 없음";
 
-            // Redis 블랙리스트에 추가
-            redisTemplate.opsForValue().set(StringKey.blackList + token, "logout", Duration.ofMinutes(30));
-            log.info("로그아웃 처리 - 유저: {}, 토큰 블랙리스트 등록 완료", username);
+            int userId = -1;
+            if (authentication != null && authentication.isAuthenticated()
+                    && !(authentication instanceof AnonymousAuthenticationToken)) {
+                Object principal = authentication.getPrincipal();
+                if (principal instanceof Integer) {
+                    userId = (Integer) principal;
+                }
+            }
 
-            // Redis 캐시된 토큰 삭제
-            redisTemplate.delete(StringKey.accessToken + username);
-            log.info("Redis 캐시 토큰 삭제: {}", username);
+            log.info("로그아웃 요청 - userId: {}, token: {}", userId, token);
 
-            // 시큐리티 컨텍스트 클리어
+            // Redis 블랙리스트 등록
+            long expiration = jwtUtil.getExpiration(token);
+            redisTemplate.opsForValue().set(StringKey.blackList + token, "logout", Duration.ofMillis(expiration));
+            log.info("블랙리스트 등록 완료");
+
+            // Redis 캐시 토큰 삭제
+            if (userId != -1) {
+                redisTemplate.delete(StringKey.accessToken + userId);
+                log.info("Redis accessToken 삭제 완료 - userId: {}", userId);
+            }
+
+            // SecurityContext 초기화
             SecurityContextHolder.clearContext();
-            log.info("시큐리티 컨텍스트 초기화 완료");
+            log.info("SecurityContextHolder 초기화 완료");
 
             return HttpResponse.builder()
-                    .status(200)
-                    .message("로그아웃 성공하였습니다.")
+                    .status(HttpStatus.OK.value())
+                    .message("로그아웃 성공")
                     .build();
 
         } catch (Exception e) {
             log.error("로그아웃 처리 중 오류 발생", e);
             return HttpResponse.builder()
-                    .status(500)
-                    .message("서버 오류로 로그아웃에 실패하였습니다.")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("서버 오류로 로그아웃에 실패했습니다.")
                     .build();
         }
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
+            return header.replace("Bearer ", "").trim();
+        }
+        return null;
     }
 }
