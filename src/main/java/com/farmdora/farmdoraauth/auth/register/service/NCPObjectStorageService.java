@@ -20,23 +20,15 @@ import java.io.OutputStream;
 @RequiredArgsConstructor
 public class NCPObjectStorageService implements NCPStorageService {
 
-//    private final Environment env;
-//
-//    private final String endPoint = env.getProperty("ncp.end-point");
-//    private final String regionName = env.getProperty("ncp.region-name");
-//    private final String accessKey = env.getProperty("ncp.access-key");
-//    private final String secretKey = env.getProperty("ncp.secret-key");
-//    private final String bucketName = env.getProperty("ncp.bucket-name");
-
-    @Value("${ncp.end-point}")
+    @Value("${ncp.object-storage.endpoint}")
     private String endPoint;
-    @Value("${ncp.region-name}")
+    @Value("${ncp.object-storage.region}")
     private String regionName;
     @Value("${ncp.access-key}")
     private String accessKey;
     @Value("${ncp.secret-key}")
     private String secretKey;
-    @Value("${ncp.bucket-name}")
+    @Value("${ncp.object-storage.bucket}")
     private String bucketName;
 
     private AmazonS3 s3;
