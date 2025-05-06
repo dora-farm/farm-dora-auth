@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -35,6 +36,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOAuth2SuccessHandler oAuth2SuccessHandler;
     private final CustomOAuth2FailureHandler oAuth2FailureHandler;
     private final UserRepository userRepository;
@@ -59,13 +61,21 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((auth)->
-                        auth.requestMatchers("/**").permitAll()
+                        auth
+                                .requestMatchers("/api/find/**").permitAll()
+                                .requestMatchers("/login/**").permitAll()
+                                .requestMatchers("/login/logout").hasAnyRole("USER", "ADMIN", "SELLER")
+                                .requestMatchers("/oauth/id/save").hasAnyRole("USER", "ADMIN", "SELLER")
+                                .requestMatchers("/api/auth/register/**").permitAll()
+                                .requestMatchers("/api/mypage/admin/user/**").hasRole("ADMIN")
+                                .requestMatchers("/api/mypage/user/**").hasRole("USER")
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().permitAll())
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,redisTemplate,userRepository),
                         UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo ->
-                                userInfo.userService(new CustomOAuth2UserService(redisTemplate)))
+                                userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler(oAuth2FailureHandler)
                 )

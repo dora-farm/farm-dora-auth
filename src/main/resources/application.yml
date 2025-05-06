@@ -1,17 +1,14 @@
-server:
-  port: 8040
-
 spring:
-  profiles:
-    active: local
 
   jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        highlight_sql: true
-        use_sql_comments: true
+    hibernate:
+      ddl-auto: validate
+
+  datasource:
+    url: jdbc:mysql://db-33rq8r-kr.vpc-pub-cdb.ntruss.com:3306/farmdora
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: farmdora
+    password: farmdora123!
 
   mail:
     host: smtp.gmail.com
@@ -29,8 +26,12 @@ spring:
         write-timeout: 5000
       auth-code-expiration-millis: 1800000
 
-  jwt:
-    secret: ENC(AJv6LokZXWCLSDdDEFT1UGe19935JohjmPnbyDPFNQWa+WgVgEaBrsg3Fo8Xo8Myj3KHBd5e5Ka5pLS8nyOm2NNBdvwSAbjfBlpcZENOkyA=)
+  data:
+    redis:
+      port: 6379
+      host: ENC(nj998P/iLMkTy602U0MI3bLVj6BYoBkQ)
+
+  jwt.secret: ENC(AJv6LokZXWCLSDdDEFT1UGe19935JohjmPnbyDPFNQWa+WgVgEaBrsg3Fo8Xo8Myj3KHBd5e5Ka5pLS8nyOm2NNBdvwSAbjfBlpcZENOkyA=)
 
   security:
     oauth2:
@@ -70,33 +71,26 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 
+ncp:
+  end-point: https://kr.object.ncloudstorage.com         # 또는 region에 맞는 엔드포인트
+  region-name: kr-standard                               # kr-standard: 한국 리전
+  access-key: ENC(RVRVkLzKJJnzhBa+JIW1jBoqA+NtwzVB0EmXMELoThBzOEQxMsm0yQ==)                           # 네이버 클라우드에서 발급받은 access key
+  secret-key: ENC(upyoBsc1bpZh0iEZIpMewgFZ32A7BJt+f28mUeFXYJvvF2g42+VUnbf/3HPXGF4mzt/KHYOSXXg=)                            # 네이버 클라우드에서 발급받은 secret key
+  bucket-name: farmtest                          # 생성한 버킷 이름
+
 jasypt:
   encryptor:
     password: ${key}
     bean: jasyptEncryptor
 
-ncp:
-  object-storage:
-    endpoint: https://kr.object.ncloudstorage.com
-    region: kr-standard
-    bucket: bitcamp-68
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 20MB
 
-  image:
-    path: https://zcbg41sa9729.edge.naverncp.com/O8XfcLSSm6/product/
-    type: ?type=h&h=192&ttype=png
+social.redirect.url: http://localhost:8040/oauth2/authorization/
+front.redirect.url: http://localhost:3000
 
-  image-optimizer:
-    project-id: O8XfcLSSm6
-    cdn-domain: zcbg41sa9729.edge.naverncp.com
-
-  access-key: ENC(oBvxn6C62QrqLs0N+lCb/UgxymXI4OALon5g0YLglZPwPFQnm6C8tw==)
-  secret-key: ENC(DF529oTSIv/sQj/hDvwfK/wWVcpf2Yrq77NrKNeZws72YdMkTsI0ziMOZr4cCFgda/jcqcaPkDM=)
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health
-  endpoint:
-    health:
-      show-details: always
+server:
+  port: 8040

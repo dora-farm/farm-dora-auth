@@ -38,4 +38,8 @@ public class Sns {
 
     @Column(nullable = false, unique = true)
     private String snsName;
+
+    public void expireSnsName() {
+        this.snsName = "deleted_sns_" + this.id;
+    }
 }

@@ -23,7 +23,6 @@ public class OauthController {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final Environment env;
-    private final JwtUtil jwtUtil;
 
     @PostMapping("/id/save")
     public HttpResponse idSave(@RequestBody Map<String, String> map, HttpServletRequest request) {

@@ -1,11 +1,13 @@
 package com.farmdora.farmdoraauth.mypage.admin.service;
 
+import com.farmdora.farmdoraauth.auth.oauth.repository.SnsRepository;
 import com.farmdora.farmdoraauth.auth.register.repository.AuthRepository;
 import com.farmdora.farmdoraauth.auth.register.repository.SellerRepository;
 import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
 import com.farmdora.farmdoraauth.entity.Auth;
 import com.farmdora.farmdoraauth.entity.Seller;
+import com.farmdora.farmdoraauth.entity.Sns;
 import com.farmdora.farmdoraauth.entity.User;
 import com.farmdora.farmdoraauth.mypage.admin.dto.SellerApprovalDto;
 import com.farmdora.farmdoraauth.mypage.admin.mapper.SellerMapper;
@@ -25,6 +27,7 @@ public class AdminUserService {
     private final SellerRepository sellerRepository;
     private final SellerMapper sellerMapper;
     private final AuthRepository authRepository;
+    private final SnsRepository snsRepository;
 
     public String blindUser(int userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("사용자 차단", userId));

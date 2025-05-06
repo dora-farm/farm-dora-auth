@@ -1,15 +1,23 @@
 package com.farmdora.farmdoraauth.auth.find.controller;
 
+import com.farmdora.farmdoraauth.auth.exception.EmailException;
 import com.farmdora.farmdoraauth.auth.find.dto.FindDto;
 import com.farmdora.farmdoraauth.auth.find.dto.SendDto;
+import com.farmdora.farmdoraauth.auth.find.dto.UserInfoDto;
+import com.farmdora.farmdoraauth.auth.find.message.FindMessage;
 import com.farmdora.farmdoraauth.auth.find.service.FindService;
 import com.farmdora.farmdoraauth.auth.register.message.StandardRegisterMassage;
 import com.farmdora.farmdoraauth.auth.register.service.UserRegisterService;
+import com.farmdora.farmdoraauth.common.exception.BaseException;
 import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -19,42 +27,40 @@ public class FindRestController {
 
     private final FindService findService;
     private final UserRegisterService userRegisterService;
-    private static final String EMAIL_SUB = "이메일 인증";
-    private static final String EMAIL_TITLE = "이메일 인증 요청";
-    private static final String EMAIL_CONTENT = "안녕하세요! 아래의 인증 코드를 일력하여 인증을 완료하세요:";
+
+    @GetMapping("/info")
+    public ResponseEntity<?> getCurrentUserInfo(Principal principal) {
+        Integer userId = Integer.parseInt(principal.getName());
+        log.info("find/info userId = {}", userId);
+        UserInfoDto userInfo = findService.getUserInfoById(userId);
+        log.info("find/info userInfo = {}", userInfo);
+        return ResponseEntity.ok()
+                .body(new HttpResponse(HttpStatus.OK, FindMessage.INFO_GET_SUCCESS.getMessage(), userInfo));
+    }
 
     @PostMapping("/send/code")
-    public HttpResponse sendVerificationCode(@RequestBody SendDto request) {
+    public ResponseEntity<?> sendVerificationCode(@RequestBody SendDto request) {
         String email = request.getEmail();
         boolean isEmail = findService.existEmail(email, request.getId(), request.getName());
         if (isEmail) {
-            userRegisterService.sendVerificationEmail(email, EMAIL_SUB, EMAIL_TITLE, EMAIL_CONTENT);
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(StandardRegisterMassage.EMAIL_SEND_SUCCESS.getMessage())
-                    .data(true)
-                    .build();
+            userRegisterService.sendVerificationEmail(email, FindMessage.EMAIL_SUB.getMessage(), FindMessage.EMAIL_TITLE.getMessage(), FindMessage.EMAIL_CONTENT.getMessage());
+
+            return ResponseEntity.ok()
+                    .body(new HttpResponse(HttpStatus.OK, StandardRegisterMassage.EMAIL_SEND_SUCCESS.getMessage(), true));
         }else {
             throw new ResourceNotFoundException("아이디, 비번 찾기",email);
         }
     }
 
     @PostMapping("/send/value")
-    public HttpResponse sendValue(@RequestBody FindDto requestBody) {
+    public ResponseEntity<?> sendValue(@RequestBody FindDto requestBody) {
     log.info("이메일 인증 후 이메일로 찾은 값 보내기 {}", requestBody.getEmail());
 
         if (findService.sendFind(requestBody.getEmail(), requestBody.getCode(), requestBody.getFind())){
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(StandardRegisterMassage.EMAIL_VERIFY_SUCCESS.getMessage())
-                    .data(true)
-                    .build();
+            return ResponseEntity.ok()
+                    .body(new HttpResponse(HttpStatus.OK, StandardRegisterMassage.EMAIL_VERIFY_SUCCESS.getMessage(), true));
         }else {
-            return HttpResponse.builder()
-                    .status(500)
-                    .message(StandardRegisterMassage.EMAIL_VERIFY_FAIL.getMessage())
-                    .data(false)
-                    .build();
+            throw new EmailException("이메일 인증 실패",HttpStatus.NOT_FOUND);
         }
     }
 }

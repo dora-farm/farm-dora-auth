@@ -1,8 +1,8 @@
 package com.farmdora.farmdoraauth.mypage.user.depot.controller;
 
+import com.farmdora.farmdoraauth.common.exception.BaseException;
+import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
 import com.farmdora.farmdoraauth.common.response.HttpResponse;
-import com.farmdora.farmdoraauth.entity.User;
-import com.farmdora.farmdoraauth.jwt.JwtUtil;
 import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotModifyRequestDto;
 import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotRegisterRequestDto;
 import com.farmdora.farmdoraauth.mypage.user.depot.dto.DepotSelectResponseDto;
@@ -11,6 +11,8 @@ import com.farmdora.farmdoraauth.mypage.user.depot.message.DepotMassage;
 import com.farmdora.farmdoraauth.mypage.user.depot.service.DepotService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -25,115 +27,78 @@ public class DepotRestController {
     private final DepotService depotService;
 
     @GetMapping("/all")
-    public HttpResponse getDepotById(Principal principal) {
+    public ResponseEntity<?> getDepotById(Principal principal) {
 
         Integer userId = Integer.parseInt(principal.getName());
-        try {
-            List<DepotSelectResponseDto> depotList = depotService.getDepotsByUserId(userId);
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(DepotMassage.DEPOT_GET_ALL_SUCCESS.getMessage())
-                    .data(depotList)
-                    .build();
-        }catch (Exception e) {
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(null)
-                    .data(null)
-                    .build();
-        }
+
+        List<DepotSelectResponseDto> depotList = depotService.getDepotsByUserId(userId);
+
+        return ResponseEntity.ok()
+                .body(new HttpResponse(HttpStatus.OK, DepotMassage.DEPOT_GET_ALL_SUCCESS.getMessage(), depotList));
     }
 
     @GetMapping("/user/address")
-    public HttpResponse getDepotAddressById(Principal principal) {
+    public ResponseEntity<?> getDepotAddressById(Principal principal) {
 
         Integer userId = Integer.parseInt(principal.getName());
         try {
             UserAddressDto userAddr = depotService.getUserAddr(userId);
-            log.info("ddd {}",userAddr.toString());
-        return HttpResponse.builder()
-                .status(200)
-                .message(DepotMassage.USER_ADDRESS_GET_SUCCESS.getMessage())
-                .data(userAddr)
-                .build();
-        }catch (Exception e){
-            log.info("ddd {}",userId);
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(DepotMassage.USER_ADDRESS_GET_FAILURE.getMessage())
-                    .data(null)
-                    .build();
+
+            return ResponseEntity.ok()
+                    .body(new HttpResponse(HttpStatus.OK, DepotMassage.USER_ADDRESS_GET_SUCCESS.getMessage(), userAddr));
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("유저 정보 조회", userId);
         }
     }
 
     @GetMapping("/detail/{depotId}")
-    public HttpResponse getDetailDepotById(@PathVariable int depotId) {
+    public ResponseEntity<?> getDetailDepotById(@PathVariable int depotId) {
         DepotSelectResponseDto depot = depotService.getDepotById(depotId);
-        return HttpResponse.builder()
-                .status(200)
-                .message(DepotMassage.DEPOT_GET_SUCCESS.getMessage())
-                .data(depot)
-                .build();
+
+        return ResponseEntity.ok()
+                .body(new HttpResponse(HttpStatus.OK, DepotMassage.DEPOT_GET_SUCCESS.getMessage(), depot));
     }
 
     @PostMapping("/register")
-    public HttpResponse saveDepot(Principal principal ,@RequestBody DepotRegisterRequestDto registerRequest) {
+    public ResponseEntity<?> saveDepot(Principal principal, @RequestBody DepotRegisterRequestDto registerRequest) {
         try {
-//            String token = JwtFromCookie.extractTokenFromCookie(request);
-//            int userId = jwtUtil.getUserId(token);
-//
+
             Integer userId = Integer.parseInt(principal.getName());
             registerRequest.setUserId(userId);
             depotService.registerDepot(registerRequest);
 
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(DepotMassage.DEPOT_REGISTER_SUCCESS.getMessage())
-                    .data(true)
-                    .build();
+            return ResponseEntity.ok()
+                    .body(new HttpResponse(HttpStatus.OK, DepotMassage.DEPOT_REGISTER_SUCCESS.getMessage(), true));
+
         } catch (Exception e) {
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(DepotMassage.DEPOT_REGISTER_FAILURE.getMessage())
-                    .data(false)
-                    .build();
+            throw new BaseException("배송지 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/modify")
-    public HttpResponse modifyDepot(@RequestBody DepotModifyRequestDto modifyRequest) {
+    public ResponseEntity<?> modifyDepot(@RequestBody DepotModifyRequestDto modifyRequest) {
 
         try {
             depotService.modifyDepot(modifyRequest);
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(DepotMassage.DEPOT_MODIFY_SUCCESS.getMessage())
-                    .data(true)
-                    .build();
+
+            return ResponseEntity.ok()
+                    .body(new HttpResponse(HttpStatus.OK, DepotMassage.DEPOT_MODIFY_SUCCESS.getMessage(), true));
         } catch (Exception e) {
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(DepotMassage.DEPOT_MODIFY_FAILURE.getMessage())
-                    .data(false)
-                    .build();
+            throw new BaseException(DepotMassage.DEPOT_MODIFY_FAILURE.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/delete/{depotId}")
-    public HttpResponse deleteDepot(@PathVariable int depotId) {
+    public ResponseEntity<?> deleteDepot(@PathVariable int depotId) {
         try {
             depotService.deleteDepot(depotId);
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(DepotMassage.DEPOT_DELETE_SUCCESS.getMessage())
-                    .data(true)
-                    .build();
+
+            return ResponseEntity.ok()
+                    .body(new HttpResponse(HttpStatus.OK, DepotMassage.DEPOT_DELETE_SUCCESS.getMessage(), true));
+
         } catch (Exception e) {
-            return HttpResponse.builder()
-                    .status(200)
-                    .message(DepotMassage.DEPOT_DELETE_FAILURE.getMessage())
-                    .data(false)
-                    .build();
+
+            throw new BaseException(DepotMassage.DEPOT_DELETE_FAILURE.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
