@@ -20,10 +20,6 @@ import java.io.OutputStream;
 @RequiredArgsConstructor
 public class NCPObjectStorageService implements NCPStorageService {
 
-    private final Environment env;
-
-//    private final String endpoint=env.getProperty("");
-
     @Value("${ncp.end-point}")
     private String endPoint;
     @Value("${ncp.region-name}")
