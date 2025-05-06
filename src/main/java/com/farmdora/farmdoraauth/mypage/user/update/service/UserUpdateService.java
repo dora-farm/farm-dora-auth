@@ -1,9 +1,11 @@
 package com.farmdora.farmdoraauth.mypage.user.update.service;
 
+import com.farmdora.farmdoraauth.auth.oauth.repository.SnsRepository;
 import com.farmdora.farmdoraauth.auth.register.repository.BankTypeRepository;
 import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
 import com.farmdora.farmdoraauth.entity.BankType;
+import com.farmdora.farmdoraauth.entity.Sns;
 import com.farmdora.farmdoraauth.entity.User;
 import com.farmdora.farmdoraauth.mypage.user.update.dto.UserModifyDto;
 import com.farmdora.farmdoraauth.mypage.user.update.dto.UserSelectDto;
@@ -14,6 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @Transactional
@@ -23,6 +27,7 @@ public class UserUpdateService {
     private final BankTypeRepository bankTypeRepository;
     private final UserUpdateMapper userUpdateMapper;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final SnsRepository snsRepository;
 
     public boolean verifyPassword(int userId, String rawPassword) {
         User user = userRepository.findById(userId)
@@ -61,5 +66,9 @@ public class UserUpdateService {
         User existUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("회원 탈퇴", userId));
         existUser.expireUser();
+        List<Sns> snsList = snsRepository.findByUser(existUser);
+        for (Sns sns : snsList) {
+            sns.expireSnsName();
+        }
     }
 }

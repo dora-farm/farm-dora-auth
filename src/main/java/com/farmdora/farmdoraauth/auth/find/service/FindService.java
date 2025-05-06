@@ -1,9 +1,13 @@
 package com.farmdora.farmdoraauth.auth.find.service;
 
+import com.farmdora.farmdoraauth.auth.find.dto.UserInfoDto;
 import com.farmdora.farmdoraauth.auth.find.findenum.FindType;
 import com.farmdora.farmdoraauth.auth.register.repository.UserRepository;
 import com.farmdora.farmdoraauth.auth.register.service.EmailSendService;
 import com.farmdora.farmdoraauth.auth.register.service.UserRegisterService;
+import com.farmdora.farmdoraauth.common.exception.ResourceNotFoundException;
+import com.farmdora.farmdoraauth.entity.Auth;
+import com.farmdora.farmdoraauth.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +28,18 @@ public class FindService {
     private final UserRegisterService userRegisterService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private static final String pool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    public UserInfoDto getUserInfoById(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", userId));
+
+        Auth auth = user.getAuth();
+
+        return UserInfoDto.builder()
+                .id(user.getId())
+                .role(auth != null ? auth.getRole() : null)
+                .build();
+    }
 
     public boolean existEmail(String email, String id, String name) {
 

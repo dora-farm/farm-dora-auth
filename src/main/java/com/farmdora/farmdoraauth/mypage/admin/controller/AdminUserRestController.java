@@ -7,6 +7,8 @@ import com.farmdora.farmdoraauth.mypage.admin.message.AdminUserMessage;
 import com.farmdora.farmdoraauth.mypage.admin.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,36 +24,28 @@ public class AdminUserRestController {
     private final AdminUserService adminUserService;
 
     @PatchMapping("/blind")
-    public HttpResponse blindUser(@RequestBody BlindRequestDto requestDto) {
+    public ResponseEntity<?> blindUser(@RequestBody BlindRequestDto requestDto) {
         String message = adminUserService.blindUser(requestDto.getUserId());
-        return HttpResponse.builder()
-                .status(200)
-                .message(message)
-                .data(true)
-                .build();
+
+        return ResponseEntity.ok()
+                .body(new HttpResponse(HttpStatus.OK, message, true));
     }
 
     @GetMapping("/approval/request")
-    public HttpResponse approvalRequestUser(){
+    public ResponseEntity<?> approvalRequestUser(){
        List<SellerApprovalDto> sellerList = adminUserService.approvalRequestUser();
 
-        return HttpResponse.builder()
-                .status(200)
-                .message("OK")
-                .data(sellerList)
-                .build();
+        return ResponseEntity.ok()
+                .body(new HttpResponse(HttpStatus.OK, AdminUserMessage.GET_SELLER_APPROVAL_LIST.getMessage(), sellerList));
     }
 
     @PatchMapping("/approval/{sellerId}")
-    public HttpResponse approvalUser(@PathVariable int sellerId){
+    public ResponseEntity<?> approvalUser(@PathVariable int sellerId){
         adminUserService.approveUser(sellerId);
 
         String message = AdminUserMessage.SELLER_APPROVE_SUCCESS.getMessage();
 
-        return HttpResponse.builder()
-                .status(200)
-                .message(message)
-                .data(true)
-                .build();
+        return ResponseEntity.ok()
+                .body(new HttpResponse(HttpStatus.OK, message, true));
     }
 }

@@ -1,7 +1,6 @@
 package com.farmdora.farmdoraauth.auth.login.dto;
 
 import com.farmdora.farmdoraauth.entity.User;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,7 +37,7 @@ public class CustomUserDetail implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return !user.isExpire();
     }
 
     @Override

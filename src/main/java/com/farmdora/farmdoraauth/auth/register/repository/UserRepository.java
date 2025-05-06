@@ -35,6 +35,4 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT new com.farmdora.farmdoraauth.mypage.user.depot.dto.UserAddressDto(u.name, u.phoneNum, u.address) FROM User u WHERE u.userId = :userId")
     UserAddressDto findUserAddressByUserId(@Param("userId") Integer userId);
-
-
 }

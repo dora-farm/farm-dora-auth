@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,25 +31,12 @@ public class CustomOAuth2FailureHandler implements AuthenticationFailureHandler 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
 
-        if (exception instanceof CustomOAuth2Exception ex) {
-            String provider = ex.getProvider();
-            String snsName = ex.getSnsName();
-            String token = ex.getToken();
-
-            int userId = jwtUtil.getUserId(token);
-            try {
-                oAuthRegisterService.registerOAuth(userId, provider, snsName);
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userId, null, jwtUtil.getAuthorities(token));
-                log.info("소셜 연동 토큰 {}", token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                response.sendRedirect(env.getProperty("front.redirect.url"));
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_FOUND);
-                response.sendRedirect(env.getProperty("front.redirect.url")+"my/user/profile?error=oauthregister");
-            }
+        if (exception instanceof DisabledException) {
+            response.sendRedirect(env.getProperty("front.redirect.url")+"/login?error=blind");
+        }else if (exception instanceof CredentialsExpiredException) {
+            response.sendRedirect(env.getProperty("front.redirect.url")+"/login?error=expired");
+        }else if (exception instanceof CustomOAuth2Exception) {
+            response.sendRedirect(env.getProperty("front.redirect.url")+"/login?error=fail");
         }
     }
 }

@@ -11,9 +11,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 
 @Slf4j
@@ -24,27 +22,13 @@ public class LoginService {
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtUtil jwtUtil;
 
-    public HttpResponse logout(HttpServletRequest request) {
+    public HttpResponse logout(String token,Integer userId) {
         try {
-            String token = extractToken(request);
-            System.out.println("로그아웃 토큰"+token);
             if (token == null) {
                 return HttpResponse.builder()
                         .status(HttpStatus.UNAUTHORIZED.value())
                         .message("유효한 토큰이 없습니다.")
                         .build();
-            }
-
-            // SecurityContext에서 사용자 정보 가져오기
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            int userId = -1;
-            if (authentication != null && authentication.isAuthenticated()
-                    && !(authentication instanceof AnonymousAuthenticationToken)) {
-                Object principal = authentication.getPrincipal();
-                if (principal instanceof Integer) {
-                    userId = (Integer) principal;
-                }
             }
 
             log.info("로그아웃 요청 - userId: {}, token: {}", userId, token);
@@ -60,7 +44,6 @@ public class LoginService {
                 log.info("Redis accessToken 삭제 완료 - userId: {}", userId);
             }
 
-            // SecurityContext 초기화
             SecurityContextHolder.clearContext();
             log.info("SecurityContextHolder 초기화 완료");
 
@@ -76,13 +59,5 @@ public class LoginService {
                     .message("서버 오류로 로그아웃에 실패했습니다.")
                     .build();
         }
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
-            return header.replace("Bearer ", "").trim();
-        }
-        return null;
     }
 }
