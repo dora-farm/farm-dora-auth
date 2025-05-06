@@ -58,6 +58,8 @@ dependencies {
     // AWS S3 SDK
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.595' // 최신 버전으로 수정 가능
 
+    // Spring Boot Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
