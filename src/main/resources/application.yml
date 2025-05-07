@@ -1,14 +1,13 @@
+server:
+  port: 8040
+
 spring:
+  profiles:
+    active: local
 
   jpa:
     hibernate:
       ddl-auto: validate
-
-  datasource:
-    url: jdbc:mysql://db-33rq8r-kr.vpc-pub-cdb.ntruss.com:3306/farmdora
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: farmdora
-    password: farmdora123!
 
   mail:
     host: smtp.gmail.com
@@ -26,12 +25,8 @@ spring:
         write-timeout: 5000
       auth-code-expiration-millis: 1800000
 
-  data:
-    redis:
-      port: 6379
-      host: ENC(nj998P/iLMkTy602U0MI3bLVj6BYoBkQ)
-
-  jwt.secret: ENC(AJv6LokZXWCLSDdDEFT1UGe19935JohjmPnbyDPFNQWa+WgVgEaBrsg3Fo8Xo8Myj3KHBd5e5Ka5pLS8nyOm2NNBdvwSAbjfBlpcZENOkyA=)
+  jwt:
+    secret: ENC(AJv6LokZXWCLSDdDEFT1UGe19935JohjmPnbyDPFNQWa+WgVgEaBrsg3Fo8Xo8Myj3KHBd5e5Ka5pLS8nyOm2NNBdvwSAbjfBlpcZENOkyA=)
 
   security:
     oauth2:
@@ -89,8 +84,9 @@ jasypt:
       max-file-size: 10MB
       max-request-size: 20MB
 
-social.redirect.url: http://localhost:8040/oauth2/authorization/
-front.redirect.url: http://localhost:3000
-
-server:
-  port: 8040
+social:
+  redirect:
+    url: http://localhost:8040/oauth2/authorization/
+front:
+  redirect:
+    url: http://localhost:3000

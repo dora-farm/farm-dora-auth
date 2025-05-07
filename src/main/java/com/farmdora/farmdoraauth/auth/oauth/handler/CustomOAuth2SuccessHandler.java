@@ -67,7 +67,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                     log.info("소셜 연동 토큰 {}", frontToken);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    response.sendRedirect(env.getProperty("front.redirect.url"));
+                    response.sendRedirect(env.getProperty("front.redirect.url")+"/?success=oauthregister");
                     return;
                 } catch (Exception e) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
