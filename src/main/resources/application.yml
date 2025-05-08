@@ -94,9 +94,3 @@ social:
 front:
   redirect:
     url: http://localhost:3000
-
-logging:
-  level:
-    org:
-      springframework:
-        security: debug

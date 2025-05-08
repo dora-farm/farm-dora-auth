@@ -17,3 +17,10 @@ logging:
     org:
       springframework:
         security: debug
+
+social:
+  redirect:
+    url: http://www.farm-dora.kro.kr/api/auth/oauth2/authorization/
+front:
+  redirect:
+    url: http://www.farm-dora.kro.kr
