@@ -1,9 +1,12 @@
+api:
+  prefix: /api/auth
+
 server:
   port: 8040
 
 spring:
   profiles:
-    active: local
+    active: prod
 
   jpa:
     hibernate:
@@ -36,7 +39,7 @@ spring:
             client-id: ENC(dwDgzhthth9TF55axqnY+/0nbrC0jMIyZ26XzA433Vlv9qcYCjLm+ZseMW7WEWER6agUVaNnA1TlyrLc4eNeMtvhjh+nA0Do5O3Go2hTHh0KzmNQMYIqzg==)
             client-secret: ENC(kMNYf89Zjqu64JO+eP4I2tcFIbi59v/DEWKTD0j7OmotS/YTm2nDwpkl8P0TFuih)
             scope: email, profile
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: "{baseUrl}/api/auth/login/oauth2/code/{registrationId}"
             client-name: Google
 
           naver:
@@ -44,14 +47,15 @@ spring:
             client-secret: ENC(8Cmm3XOZfYYsHPw4GCSD6unfTJsP9pZH)
             client-name: Naver
             authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: "{baseUrl}/api/auth/login/oauth2/code/{registrationId}"
+#            redirect-uri: "http://localhost:8040/api/auth/login/oauth2/code/naver"
             scope: name, email
 
           kakao:
             client-id: ENC(+rrW5X+/yoleADUlkZ4c6J5azM0hLRLZUZrlDxVqfbMj2+n1Ii1sKplxgPt9LDGP)
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: "{baseUrl}/api/auth/login/oauth2/code/{registrationId}"
 
         provider:
           naver:
@@ -69,9 +73,9 @@ spring:
 ncp:
   end-point: https://kr.object.ncloudstorage.com         # 또는 region에 맞는 엔드포인트
   region-name: kr-standard                               # kr-standard: 한국 리전
-  access-key: ENC(RVRVkLzKJJnzhBa+JIW1jBoqA+NtwzVB0EmXMELoThBzOEQxMsm0yQ==)                           # 네이버 클라우드에서 발급받은 access key
-  secret-key: ENC(upyoBsc1bpZh0iEZIpMewgFZ32A7BJt+f28mUeFXYJvvF2g42+VUnbf/3HPXGF4mzt/KHYOSXXg=)                            # 네이버 클라우드에서 발급받은 secret key
-  bucket-name: farmtest                          # 생성한 버킷 이름
+  access-key: ENC(mrc9PBNu6+yx4ZfH3tMzXieeQ/xXQt6M61Ag2vU3cFkpPknpSESCig==)                           # 네이버 클라우드에서 발급받은 access key
+  secret-key: ENC(59/wKkufTr7NsSlFf//tqfL7l95nkxzUnVALZoVNodWA8okbMMq+IoduD4crURJmHHULKZgAU6U=)                            # 네이버 클라우드에서 발급받은 secret key
+  bucket-name: bitcamp-68                          # 생성한 버킷 이름
 
 jasypt:
   encryptor:
@@ -86,7 +90,13 @@ jasypt:
 
 social:
   redirect:
-    url: http://localhost:8040/oauth2/authorization/
+    url: http://localhost:8040/api/auth/oauth2/authorization/
 front:
   redirect:
     url: http://localhost:3000
+
+logging:
+  level:
+    org:
+      springframework:
+        security: debug

@@ -25,7 +25,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @Transactional
-@RequestMapping("/api/auth/register")
+@RequestMapping("${api.prefix}/register")
 public class RegisterRestController {
     private final UserRegisterService userRegisterService;
     private static final String EMAIL_SUB = "이메일 인증";

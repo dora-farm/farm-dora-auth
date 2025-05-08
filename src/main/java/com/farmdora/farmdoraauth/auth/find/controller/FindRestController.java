@@ -22,21 +22,11 @@ import java.security.Principal;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/find")
+@RequestMapping("${api.prefix}/find")
 public class FindRestController {
 
     private final FindService findService;
     private final UserRegisterService userRegisterService;
-
-    @GetMapping("/info")
-    public ResponseEntity<?> getCurrentUserInfo(Principal principal) {
-        Integer userId = Integer.parseInt(principal.getName());
-        log.info("find/info userId = {}", userId);
-        UserInfoDto userInfo = findService.getUserInfoById(userId);
-        log.info("find/info userInfo = {}", userInfo);
-        return ResponseEntity.ok()
-                .body(new HttpResponse(HttpStatus.OK, FindMessage.INFO_GET_SUCCESS.getMessage(), userInfo));
-    }
 
     @PostMapping("/send/code")
     public ResponseEntity<?> sendVerificationCode(@RequestBody SendDto request) {
@@ -54,7 +44,6 @@ public class FindRestController {
 
     @PostMapping("/send/value")
     public ResponseEntity<?> sendValue(@RequestBody FindDto requestBody) {
-    log.info("이메일 인증 후 이메일로 찾은 값 보내기 {}", requestBody.getEmail());
 
         if (findService.sendFind(requestBody.getEmail(), requestBody.getCode(), requestBody.getFind())){
             return ResponseEntity.ok()

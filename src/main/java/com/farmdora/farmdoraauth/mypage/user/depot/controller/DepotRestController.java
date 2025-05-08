@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/mypage/user/depot")
+@RequestMapping("${api.prefix}/mypage/user/depot")
 public class DepotRestController {
 
     private final DepotService depotService;
