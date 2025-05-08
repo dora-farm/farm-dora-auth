@@ -18,7 +18,7 @@ import java.util.List;
 @Transactional
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/mypage/admin/user")
+@RequestMapping("${api.prefix}/mypage/admin/user")
 public class AdminUserRestController {
 
     private final AdminUserService adminUserService;

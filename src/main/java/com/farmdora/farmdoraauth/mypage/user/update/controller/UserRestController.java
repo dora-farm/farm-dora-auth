@@ -27,7 +27,7 @@ import java.security.Principal;
 @Slf4j
 @Transactional
 @RestController
-@RequestMapping("/api/mypage/user")
+@RequestMapping("${api.prefix}/mypage/user")
 @RequiredArgsConstructor
 public class UserRestController {
 

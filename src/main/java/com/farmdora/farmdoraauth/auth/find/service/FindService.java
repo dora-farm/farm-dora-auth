@@ -29,17 +29,6 @@ public class FindService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private static final String pool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    public UserInfoDto getUserInfoById(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found", userId));
-
-        Auth auth = user.getAuth();
-
-        return UserInfoDto.builder()
-                .id(user.getId())
-                .role(auth != null ? auth.getRole() : null)
-                .build();
-    }
 
     public boolean existEmail(String email, String id, String name) {
 

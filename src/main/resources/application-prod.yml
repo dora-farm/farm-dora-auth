@@ -11,3 +11,9 @@ spring:
     redis:
       host: ENC(VFdUc/6tLyxg23xcLaVduyy/WRypzmZy)
       port: 6379
+
+logging:
+  level:
+    org:
+      springframework:
+        security: debug

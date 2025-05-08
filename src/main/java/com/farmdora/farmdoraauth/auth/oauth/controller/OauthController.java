@@ -16,7 +16,7 @@ import java.time.Duration;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/oauth")
+@RequestMapping("${api.prefix}/oauth")
 @RequiredArgsConstructor
 @Slf4j
 public class OauthController {
@@ -26,6 +26,7 @@ public class OauthController {
 
     @PostMapping("/id/save")
     public HttpResponse idSave(@RequestBody Map<String, String> map, HttpServletRequest request) {
+
         String provider = map.get(StringKey.provider);
 
         String authorizationHeader = request.getHeader("Authorization");
@@ -42,6 +43,7 @@ public class OauthController {
         redisTemplate.opsForValue().set(StringKey.frontFromToken, token, Duration.ofMinutes(5));
 
         String redirectUrl = env.getProperty("social.redirect.url") + provider;
+
         log.info("redirectUrl = {}", redirectUrl);
         return HttpResponse.builder()
                 .message("아이디 저장성공")

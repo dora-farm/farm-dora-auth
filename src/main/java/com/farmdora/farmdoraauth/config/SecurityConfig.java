@@ -55,35 +55,34 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, redisTemplate, userRepository);
+        loginFilter.setFilterProcessesUrl("/api/auth/login"); // ⭐️ 로그인 경로 변경
+
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((auth)->
-                        auth
-                                .requestMatchers("/api/find/**").permitAll()
-                                .requestMatchers("/login/**").permitAll()
-                                .requestMatchers("/login/logout").hasAnyRole("USER", "ADMIN", "SELLER")
-                                .requestMatchers("/oauth/id/save").hasAnyRole("USER", "ADMIN", "SELLER")
-                                .requestMatchers("/api/auth/register/**").permitAll()
-                                .requestMatchers("/api/mypage/admin/user/**").hasRole("ADMIN")
-                                .requestMatchers("/api/mypage/user/**").hasRole("USER")
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .anyRequest().permitAll())
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,redisTemplate,userRepository),
-                        UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/api/auth/find/**").permitAll()
+                        .requestMatchers("/api/auth/login/**").permitAll()
+                        .requestMatchers("/api/auth/login/oauth2/code/**").permitAll()
+                        .requestMatchers("/api/auth/login/logout").hasAnyRole("USER", "ADMIN", "SELLER")
+                        .requestMatchers("/api/auth/oauth/id/save").hasAnyRole("USER", "ADMIN", "SELLER")
+                        .requestMatchers("/api/auth/auth/register/**").permitAll()
+                        .requestMatchers("/api/auth/mypage/admin/user/**").hasRole("ADMIN")
+                        .requestMatchers("/api/auth/mypage/user/**").hasRole("USER")
+                        .anyRequest().permitAll())
+                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)  // 수정된 loginFilter 등록
                 .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo ->
-                                userInfo.userService(customOAuth2UserService))
+                        .authorizationEndpoint(auth->auth.baseUri("/api/auth/oauth2/authorization/**"))
+                        .redirectionEndpoint(auth -> auth.baseUri("/api/auth/login/oauth2/code/{registrationId}"))
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
-                        .failureHandler(oAuth2FailureHandler)
-                )
+                        .failureHandler(oAuth2FailureHandler))
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, redisTemplate),
                         UsernamePasswordAuthenticationFilter.class)
-
-                .sessionManagement((session)->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 
