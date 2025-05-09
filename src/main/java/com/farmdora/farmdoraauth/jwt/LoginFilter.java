@@ -73,8 +73,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // Set-Cookie로 토큰 내려주기 (HttpOnly, Secure 개발환경 false)
         Cookie jwtCookie = new Cookie("jwt_token", token);
         jwtCookie.setHttpOnly(false); // client js에서 쿠키 접근 가능, true일 경우 불가능
-        jwtCookie.setSecure(false); // 배포 환경에선 true
+//        jwtCookie.setSecure(false); // 배포 환경에선 true
+        jwtCookie.setSecure(true); // 배포 환경에선 true
         jwtCookie.setPath("/");
+        jwtCookie.setAttribute("SameSite", "None");
         jwtCookie.setMaxAge((int) Duration.ofHours(5).getSeconds());
 
         response.addCookie(jwtCookie);

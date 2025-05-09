@@ -95,7 +95,7 @@ public class SecurityConfig {
                 "http://localhost:3001",
                 "http://farm-dora.kro.kr",
                 "http://www.farm-dora.kro.kr",
-                "https://farm-dora.kro.kr"
+                "https://www.farm-dora.kro.kr"
         )); // 허용할 도메인
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*")); // 모든 요청 헤더를 수락한다.

@@ -103,8 +103,10 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             response.setContentType("application/json;charset=utf-8");
             Cookie cookie = new Cookie("jwt_token", token);
             cookie.setHttpOnly(false);
-            cookie.setSecure(false);
+//            cookie.setSecure(false);
+            cookie.setSecure(true);
             cookie.setPath("/");
+            cookie.setAttribute("SameSite", "None");
             cookie.setMaxAge(60 * 60 * 5);
             response.addCookie(cookie);
             response.sendRedirect(env.getProperty("front.redirect.url"));
