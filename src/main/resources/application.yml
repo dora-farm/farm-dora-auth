@@ -55,7 +55,7 @@ spring:
             client-id: ENC(+rrW5X+/yoleADUlkZ4c6J5azM0hLRLZUZrlDxVqfbMj2+n1Ii1sKplxgPt9LDGP)
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: "https://www.farm-dora.kro.kr/api/auth/login/oauth2/code/{registrationId}"
+            redirect-uri: "{baseUrl}/api/auth/login/oauth2/code/{registrationId}"
 
         provider:
           naver:
