@@ -36,7 +36,7 @@ public class LoginRestController {
         // 클라이언트의 jwt_token 쿠키 만료시키기
         ResponseCookie expiredCookie = ResponseCookie.from("jwt_token", "")
                 .httpOnly(false)
-                .secure(false) // 운영 환경에서는 true
+                .secure(true) // 운영 환경에서는 true
                 .path("/")
                 .maxAge(0)
                 .build();
