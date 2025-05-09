@@ -20,7 +20,7 @@ logging:
 
 social:
   redirect:
-    url: http://www.farm-dora.kro.kr/api/auth/oauth2/authorization/
+    url: https://www.farm-dora.kro.kr/api/auth/oauth2/authorization/
 front:
   redirect:
-    url: http://www.farm-dora.kro.kr
+    url: https://www.farm-dora.kro.kr
