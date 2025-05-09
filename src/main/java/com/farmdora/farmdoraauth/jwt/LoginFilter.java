@@ -75,7 +75,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         jwtCookie.setHttpOnly(false); // client js에서 쿠키 접근 가능, true일 경우 불가능
         jwtCookie.setSecure(false); // 배포 환경에선 true
         jwtCookie.setPath("/");
-        jwtCookie.setMaxAge((int) Duration.ofHours(3).getSeconds());
+        jwtCookie.setMaxAge((int) Duration.ofHours(5).getSeconds());
 
         response.addCookie(jwtCookie);
 

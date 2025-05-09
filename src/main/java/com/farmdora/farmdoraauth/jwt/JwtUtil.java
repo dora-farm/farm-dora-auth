@@ -44,6 +44,14 @@ public class JwtUtil {
                 .getPayload().get("userId", Integer.class);
     }
 
+    public String getUsername(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload().get("username", String.class);
+    }
+
     public Collection<? extends GrantedAuthority> getAuthorities(String token) {
        String role = Jwts.parser()
                .verifyWith(secretKey)
@@ -72,11 +80,13 @@ public class JwtUtil {
         return Jwts.builder()
                 .claim("userId",userId)
                 .claim("role",role)
+                .claim("username",username)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
     }
+
     private Jws<Claims> parseJws(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)

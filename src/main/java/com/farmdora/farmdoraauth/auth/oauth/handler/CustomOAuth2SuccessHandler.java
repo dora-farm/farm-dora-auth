@@ -105,7 +105,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             cookie.setHttpOnly(false);
             cookie.setSecure(false);
             cookie.setPath("/");
-            cookie.setDomain("localhost");
             cookie.setMaxAge(60 * 60 * 5);
             response.addCookie(cookie);
             response.sendRedirect(env.getProperty("front.redirect.url"));
